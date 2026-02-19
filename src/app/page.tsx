@@ -20,12 +20,14 @@ export default function Home() {
           >
             🎮 Play Game
           </Link>
-          <Link 
-            href="/docs"
+          <a 
+            href="https://github.com/headsmanC0de/mooncraft/tree/main/docs"
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white font-bold text-lg rounded-lg border border-gray-600 transition-all"
           >
             📚 Documentation
-          </Link>
+          </a>
         </div>
         
         <div className="pt-8 border-t border-white/10 max-w-2xl mx-auto">
