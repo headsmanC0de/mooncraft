@@ -74,7 +74,7 @@ describe('Entity Factory', () => {
     it('should create unit with specified health', () => {
       const unit = createTestUnit({ health: 200 })
       
-      const health = unit.components.get(ComponentType.HEALTH)
+      const health = unit.components.get(ComponentType.HEALTH) as any
       expect(health?.current).toBe(200)
       expect(health?.max).toBe(200)
     })
@@ -83,8 +83,8 @@ describe('Entity Factory', () => {
       const selectedUnit = createTestUnit({ isSelected: true })
       const unselectedUnit = createTestUnit({ isSelected: false })
       
-      const selected = selectedUnit.components.get(ComponentType.SELECTION)
-      const unselected = unselectedUnit.components.get(ComponentType.SELECTION)
+      const selected = selectedUnit.components.get(ComponentType.SELECTION) as any
+      const unselected = unselectedUnit.components.get(ComponentType.SELECTION) as any
       
       expect(selected?.isSelected).toBe(true)
       expect(unselected?.isSelected).toBe(false)
@@ -101,14 +101,14 @@ describe('Entity Factory', () => {
     it('should create unit with specified attack damage', () => {
       const unit = createTestCombatUnit({ attackDamage: 25 })
       
-      const combat = unit.components.get(ComponentType.COMBAT)
+      const combat = unit.components.get(ComponentType.COMBAT) as any
       expect(combat?.attackDamage).toBe(25)
     })
 
     it('should create unit with specified attack range', () => {
       const unit = createTestCombatUnit({ attackRange: 10 })
       
-      const combat = unit.components.get(ComponentType.COMBAT)
+      const combat = unit.components.get(ComponentType.COMBAT) as any
       expect(combat?.attackRange).toBe(10)
     })
   })
