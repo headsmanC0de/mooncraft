@@ -4,7 +4,7 @@
 
 import { System } from '../SystemManager'
 import { ComponentType, type Entity, type CombatComponent, type TransformComponent, type HealthComponent } from '@/types/ecs'
-import { componentManager, entityManager } from '../index'
+import { entityManager } from '../index'
 
 export class CombatSystem extends System {
   readonly requiredComponents = [

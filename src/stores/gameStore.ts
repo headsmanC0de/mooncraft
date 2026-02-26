@@ -31,7 +31,7 @@ interface GameStore extends GameState {
   setCameraZoom: (zoom: number) => void
   pause: () => void
   resume: () => void
-  tick: (delta: number) => void
+  updateTick: (delta: number) => void
 }
 
 export const useGameStore = create<GameStore>()(
@@ -148,7 +148,7 @@ export const useGameStore = create<GameStore>()(
       set({ isPaused: false })
     },
 
-    tick: (delta) => {
+    updateTick: (delta) => {
       const { isPaused, speed } = get()
       if (isPaused) return
 
