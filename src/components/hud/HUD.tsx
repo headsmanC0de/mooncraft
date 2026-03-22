@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
 import { CommandPanel } from './CommandPanel'
 import { GameOverScreen } from './GameOverScreen'
@@ -9,6 +10,13 @@ import { SelectionPanel } from './SelectionPanel'
 
 export function HUD() {
 	const gameStatus = useGameStore((s) => s.gameStatus)
+
+	useEffect(() => {
+		// Expose gameStore on window in dev mode for E2E testing
+		if (process.env.NODE_ENV === 'development') {
+			;(window as any).__gameStore = useGameStore
+		}
+	}, [])
 
 	return (
 		<div
