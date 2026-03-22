@@ -5,17 +5,35 @@ import { useGameStore } from '@/stores/gameStore'
 import { CommandPanel } from './CommandPanel'
 import { GameOverScreen } from './GameOverScreen'
 import { Minimap } from './Minimap'
+import { PauseMenu } from './PauseMenu'
 import { ResourceBar } from './ResourceBar'
 import { SelectionPanel } from './SelectionPanel'
 
 export function HUD() {
 	const gameStatus = useGameStore((s) => s.gameStatus)
+	const showPauseMenu = useGameStore((s) => s.showPauseMenu)
 
 	useEffect(() => {
 		// Expose gameStore on window in dev mode for E2E testing
 		if (process.env.NODE_ENV === 'development') {
 			;(window as any).__gameStore = useGameStore
 		}
+	}, [])
+
+	useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				const state = useGameStore.getState()
+				if (state.gameStatus !== 'playing') return
+				if (state.placementMode) {
+					state.setPlacementMode(null)
+					return
+				}
+				state.togglePauseMenu()
+			}
+		}
+		window.addEventListener('keydown', onKeyDown)
+		return () => window.removeEventListener('keydown', onKeyDown)
 	}, [])
 
 	return (
@@ -49,6 +67,7 @@ export function HUD() {
 				<CommandPanel />
 			</div>
 			{gameStatus !== 'playing' && <GameOverScreen status={gameStatus} />}
+			{gameStatus === 'playing' && showPauseMenu && <PauseMenu />}
 		</section>
 	)
 }

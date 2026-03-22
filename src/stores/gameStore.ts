@@ -37,6 +37,7 @@ interface GameStore extends GameState {
 	// UI State
 	placementMode: string | null
 	hoveredEntity: EntityId | null
+	showPauseMenu: boolean
 
 	// Game status
 	gameStatus: GameStatus
@@ -53,6 +54,7 @@ interface GameStore extends GameState {
 	setCameraZoom: (zoom: number) => void
 	pause: () => void
 	resume: () => void
+	togglePauseMenu: () => void
 	tick: (delta: number) => void
 }
 
@@ -69,6 +71,7 @@ export const useGameStore = create<GameStore>()(
 		cameraZoom: 30,
 		placementMode: null,
 		hoveredEntity: null,
+		showPauseMenu: false,
 		gameStatus: 'playing' as GameStatus,
 
 		initializeGame: () => {
@@ -318,6 +321,17 @@ export const useGameStore = create<GameStore>()(
 		resume: () => {
 			systemManager.start()
 			set({ isPaused: false })
+		},
+
+		togglePauseMenu: () => {
+			const { showPauseMenu } = get()
+			if (showPauseMenu) {
+				systemManager.start()
+				set({ showPauseMenu: false, isPaused: false })
+			} else {
+				systemManager.stop()
+				set({ showPauseMenu: true, isPaused: true })
+			}
 		},
 
 		tick: (delta) => {
