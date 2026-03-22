@@ -12,6 +12,7 @@ import {
 	EntityFactory,
 	entityManager,
 	MovementSystem,
+	ResourceSystem,
 	systemManager,
 } from '@/lib/ecs'
 import type { EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
@@ -61,6 +62,7 @@ export const useGameStore = create<GameStore>()(
 			systemManager.registerSystem(new MovementSystem())
 			systemManager.registerSystem(new BuildingSystem())
 			systemManager.registerSystem(new CombatSystem())
+			systemManager.registerSystem(new ResourceSystem())
 
 			// Initialize players
 			const players = new Map<string, PlayerState>()

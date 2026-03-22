@@ -18,6 +18,7 @@ export enum ComponentType {
 	SELECTION = 'selection',
 	ANIMATION = 'animation',
 	RENDER = 'render',
+	RESOURCE_CARRIER = 'resource_carrier',
 }
 
 // Vector types
@@ -104,6 +105,17 @@ export interface RenderComponent {
 	visible: boolean
 }
 
+export interface ResourceCarrierComponent {
+	type: ComponentType.RESOURCE_CARRIER
+	state: 'idle' | 'moving_to_resource' | 'gathering' | 'returning'
+	targetResourceId: EntityId | null
+	returnBuildingId: EntityId | null
+	currentLoad: number
+	maxCapacity: number
+	gatherRate: number
+	gatherTimer: number
+}
+
 // Union type for all components
 export type Component =
 	| TransformComponent
@@ -116,6 +128,7 @@ export type Component =
 	| SelectionComponent
 	| AnimationComponent
 	| RenderComponent
+	| ResourceCarrierComponent
 
 // Production queue item
 export interface ProductionQueueItem {

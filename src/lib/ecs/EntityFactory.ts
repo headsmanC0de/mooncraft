@@ -64,6 +64,18 @@ export class EntityFactory {
 				targetId: null,
 			})
 		}
+		if (def.canGather) {
+			this.components.addComponent(id, {
+				type: ComponentType.RESOURCE_CARRIER,
+				state: 'idle',
+				targetResourceId: null,
+				returnBuildingId: null,
+				currentLoad: 0,
+				maxCapacity: GAME_CONFIG.mineralPatch.gatherRate,
+				gatherRate: GAME_CONFIG.mineralPatch.gatherRate,
+				gatherTimer: 0,
+			})
+		}
 		return id
 	}
 
