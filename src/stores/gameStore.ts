@@ -6,6 +6,7 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import {
+	AISystem,
 	BuildingSystem,
 	CombatSystem,
 	componentManager,
@@ -18,6 +19,7 @@ import {
 } from '@/lib/ecs'
 import { getBuildingDef } from '@/config/buildings'
 import { getUnitDef } from '@/config/units'
+import type { GameStatus } from '@/lib/game/GameManager'
 import type {
 	BuildingComponent,
 	EntityId,
@@ -39,6 +41,9 @@ interface GameStore extends GameState {
 	// UI State
 	placementMode: string | null
 	hoveredEntity: EntityId | null
+
+	// Game status
+	gameStatus: GameStatus
 
 	// Actions
 	initializeGame: () => void
@@ -68,6 +73,7 @@ export const useGameStore = create<GameStore>()(
 		cameraZoom: 30,
 		placementMode: null,
 		hoveredEntity: null,
+		gameStatus: 'playing' as GameStatus,
 
 		initializeGame: () => {
 			// Register systems
@@ -92,6 +98,7 @@ export const useGameStore = create<GameStore>()(
 				}
 			})
 			systemManager.registerSystem(resourceSystem)
+			systemManager.registerSystem(new AISystem())
 
 			// Initialize players
 			const players = new Map<string, PlayerState>()
