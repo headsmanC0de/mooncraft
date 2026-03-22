@@ -15,6 +15,7 @@ import type { EntityFactory } from '../../EntityFactory'
 import type { EntityManager } from '../../EntityManager'
 import {
 	findBuildingOfType,
+	getFactionMapping,
 	getSupplyInfo,
 	placeBuilding,
 	sendWorkersToGather,
@@ -25,7 +26,10 @@ export function executeAttackPhase(
 	entities: Entity[],
 	factory: EntityFactory,
 	em: EntityManager,
+	faction: 'terran' | 'protoss' = 'terran',
 ): void {
+	const m = getFactionMapping(faction)
+
 	// Find all AI combat units (non-workers with combat component)
 	const combatUnits = entities.filter((e) => {
 		const combat = e.components.get(ComponentType.COMBAT)
@@ -76,18 +80,18 @@ export function executeAttackPhase(
 
 	// Also continue economy
 	const supply = getSupplyInfo(entities)
-	const barracks = findBuildingOfType(entities, 'barracks')
-	if (barracks && supply.used + 1 <= supply.max) {
-		trainFromBuilding(barracks, 'marine')
+	const militaryBuilding = findBuildingOfType(entities, m.basicMilitary)
+	if (militaryBuilding && supply.used + 1 <= supply.max) {
+		trainFromBuilding(militaryBuilding, m.basicUnit)
 	}
 
-	const factoryBuilding = findBuildingOfType(entities, 'factory')
-	if (factoryBuilding && supply.used + 3 <= supply.max) {
-		trainFromBuilding(factoryBuilding, 'siege_tank')
+	const advancedBuilding = findBuildingOfType(entities, m.advancedMilitary)
+	if (advancedBuilding && supply.used + 3 <= supply.max) {
+		trainFromBuilding(advancedBuilding, m.heavyUnit)
 	}
 
 	if (supply.max - supply.used < 4) {
-		placeBuilding(factory, 'supply_depot')
+		placeBuilding(factory, m.supplyBuilding)
 	}
 
 	sendWorkersToGather(entities, em)

@@ -42,12 +42,16 @@ export class AISystem extends System {
 			return owner?.playerId === 'player2'
 		})
 
+		const firstAI = aiEntities[0]
+		const firstOwner = firstAI?.components.get(ComponentType.OWNER) as OwnerComponent | undefined
+		const faction = firstOwner?.faction ?? 'terran'
+
 		if (this.gameTime < 120) {
-			executeBuildPhase(aiEntities, this.factory, this.em)
+			executeBuildPhase(aiEntities, this.factory, this.em, faction)
 		} else if (this.gameTime < 300) {
-			executeExpandPhase(aiEntities, this.factory, this.em)
+			executeExpandPhase(aiEntities, this.factory, this.em, faction)
 		} else {
-			executeAttackPhase(aiEntities, this.factory, this.em)
+			executeAttackPhase(aiEntities, this.factory, this.em, faction)
 		}
 	}
 }
