@@ -1,5 +1,6 @@
 'use client'
 
+import { Component, type ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
@@ -16,6 +17,66 @@ const GameCanvas = dynamic(
 		loading: () => <LoadingScreen />,
 	},
 )
+
+interface ErrorBoundaryState {
+	hasError: boolean
+	error: Error | null
+}
+
+class GameErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
+	state: ErrorBoundaryState = { hasError: false, error: null }
+
+	static getDerivedStateFromError(error: Error) {
+		return { hasError: true, error }
+	}
+
+	render() {
+		if (this.state.hasError) {
+			return (
+				<div
+					style={{
+						width: '100vw',
+						height: '100vh',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						background: '#0a0a0f',
+						color: '#fff',
+						fontFamily: 'monospace',
+						textAlign: 'center',
+						padding: '2rem',
+					}}
+				>
+					<h1 style={{ fontSize: '2rem', marginBottom: '1rem', color: '#dd3333' }}>
+						Failed to Load Game
+					</h1>
+					<p style={{ color: '#9ca3af', marginBottom: '1rem', maxWidth: '400px' }}>
+						Your browser may not support WebGL, or the graphics driver crashed. Try
+						refreshing or using a different browser.
+					</p>
+					<button
+						type="button"
+						onClick={() => window.location.reload()}
+						style={{
+							padding: '12px 24px',
+							background: '#4a9fd9',
+							color: '#000',
+							border: 'none',
+							borderRadius: '6px',
+							cursor: 'pointer',
+							fontSize: '1rem',
+							fontWeight: 'bold',
+						}}
+					>
+						Refresh Page
+					</button>
+				</div>
+			)
+		}
+		return this.props.children
+	}
+}
 
 function LoadingScreen() {
 	return (
@@ -92,7 +153,7 @@ function GamePageInner() {
 	}
 
 	return (
-		<div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+		<div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
 			<GameCanvas />
 			<HUD />
 		</div>
@@ -101,8 +162,10 @@ function GamePageInner() {
 
 export default function GamePage() {
 	return (
-		<Suspense fallback={<LoadingScreen />}>
-			<GamePageInner />
-		</Suspense>
+		<GameErrorBoundary>
+			<Suspense fallback={<LoadingScreen />}>
+				<GamePageInner />
+			</Suspense>
+		</GameErrorBoundary>
 	)
 }
