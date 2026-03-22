@@ -52,11 +52,7 @@ function CommandButton({
 }) {
 	const [hovered, setHovered] = useState(false)
 
-	const style = disabled
-		? disabledButtonStyle
-		: hovered
-			? buttonHoverStyle
-			: buttonStyle
+	const style = disabled ? disabledButtonStyle : hovered ? buttonHoverStyle : buttonStyle
 
 	return (
 		<button
@@ -177,13 +173,10 @@ export function CommandPanel() {
 							gap: 4,
 						}}
 					>
-						{(['supply_depot', 'barracks', 'factory'] as const).map(
-						(type) => {
+						{(['supply_depot', 'barracks', 'factory'] as const).map((type) => {
 							const def = getBuildingDef(type)
 							const available = canBuild(type, 'player1')
-							const requirementNames = def.requirements.map(
-								(r) => getBuildingDef(r).name,
-							)
+							const requirementNames = def.requirements.map((r) => getBuildingDef(r).name)
 							const costStr = `${def.cost.minerals} minerals${def.cost.gas ? `, ${def.cost.gas} gas` : ''}`
 							return (
 								<CommandButton
@@ -192,15 +185,10 @@ export function CommandPanel() {
 									ariaLabel={`Build ${def.name} - ${costStr}`}
 									onClick={() => handleBuildClick(type)}
 									disabled={!available}
-									tooltip={
-										available
-											? undefined
-											: `Requires: ${requirementNames.join(', ')}`
-									}
+									tooltip={available ? undefined : `Requires: ${requirementNames.join(', ')}`}
 								/>
 							)
-						},
-					)}
+						})}
 						<CommandButton
 							label="Back"
 							ariaLabel="Back to commands"

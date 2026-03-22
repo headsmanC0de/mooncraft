@@ -29,11 +29,7 @@ export class AISystem extends System {
 	private factory: EntityFactory
 	private em: EntityManager
 
-	constructor(
-		em?: EntityManager,
-		cm?: ComponentManager,
-		difficulty: AIDifficulty = 'normal',
-	) {
+	constructor(em?: EntityManager, cm?: ComponentManager, difficulty: AIDifficulty = 'normal') {
 		super()
 		this.em = em ?? defaultEM
 		const cm_ = cm ?? defaultCM

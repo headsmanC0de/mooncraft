@@ -88,10 +88,7 @@ describe('canBuild', () => {
 		expect(canBuild('gateway', 'player1', entities)).toBe(true)
 		expect(canBuild('robotics_facility', 'player1', entities)).toBe(false)
 
-		const withGateway = [
-			...entities,
-			makeBuilding('b2', 'gateway', 'player1'),
-		]
+		const withGateway = [...entities, makeBuilding('b2', 'gateway', 'player1')]
 		expect(canBuild('robotics_facility', 'player1', withGateway)).toBe(true)
 	})
 })

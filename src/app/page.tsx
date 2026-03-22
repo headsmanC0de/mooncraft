@@ -140,7 +140,11 @@ export default function Home() {
 						Choose your faction:
 					</p>
 
-					<div style={{ display: 'flex', gap: '16px' }} role="radiogroup" aria-label="Choose faction">
+					<div
+						style={{ display: 'flex', gap: '16px' }}
+						role="radiogroup"
+						aria-label="Choose faction"
+					>
 						{(Object.keys(factionInfo) as Faction[]).map((faction) => {
 							const info = factionInfo[faction]
 							const isSelected = selectedFaction === faction
@@ -223,7 +227,11 @@ export default function Home() {
 					>
 						Difficulty:
 					</p>
-					<div style={{ display: 'flex', gap: '8px' }} role="radiogroup" aria-label="Choose difficulty">
+					<div
+						style={{ display: 'flex', gap: '8px' }}
+						role="radiogroup"
+						aria-label="Choose difficulty"
+					>
 						{(['easy', 'normal', 'hard'] as Difficulty[]).map((diff) => {
 							const isSelected = selectedDifficulty === diff
 							const label = GAME_CONFIG.aiDifficulty[diff].label
@@ -235,12 +243,8 @@ export default function Home() {
 									onClick={() => setSelectedDifficulty(diff)}
 									style={{
 										padding: '8px 18px',
-										background: isSelected
-											? 'rgba(0, 255, 136, 0.1)'
-											: 'rgba(255,255,255,0.03)',
-										border: isSelected
-											? '2px solid #00ff88'
-											: '1px solid rgba(255,255,255,0.15)',
+										background: isSelected ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255,255,255,0.03)',
+										border: isSelected ? '2px solid #00ff88' : '1px solid rgba(255,255,255,0.15)',
 										borderRadius: '6px',
 										color: isSelected ? '#00ff88' : '#d1d5db',
 										fontWeight: isSelected ? 700 : 500,
@@ -279,7 +283,11 @@ export default function Home() {
 					>
 						Map:
 					</p>
-					<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }} role="radiogroup" aria-label="Choose map">
+					<div
+						style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}
+						role="radiogroup"
+						aria-label="Choose map"
+					>
 						{[{ id: 'random', name: 'Random' }, ...MAP_DEFINITIONS].map((map) => {
 							const isSelected = selectedMap === map.id
 							return (
@@ -290,12 +298,8 @@ export default function Home() {
 									onClick={() => setSelectedMap(map.id)}
 									style={{
 										padding: '6px 14px',
-										background: isSelected
-											? 'rgba(0, 255, 136, 0.1)'
-											: 'rgba(255,255,255,0.03)',
-										border: isSelected
-											? '2px solid #00ff88'
-											: '1px solid rgba(255,255,255,0.15)',
+										background: isSelected ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255,255,255,0.03)',
+										border: isSelected ? '2px solid #00ff88' : '1px solid rgba(255,255,255,0.15)',
 										borderRadius: '6px',
 										color: isSelected ? '#00ff88' : '#d1d5db',
 										fontWeight: isSelected ? 700 : 500,

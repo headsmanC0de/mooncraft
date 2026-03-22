@@ -24,10 +24,10 @@ import {
 	systemManager,
 	VisionSystem,
 } from '@/lib/ecs'
+import type { AIDifficulty } from '@/lib/ecs/systems/AISystem'
 import type { GameStatus } from '@/lib/game/GameManager'
 import { calculateSupplyFromEntities } from '@/lib/game/supply'
 import { canBuild } from '@/lib/game/techTree'
-import type { AIDifficulty } from '@/lib/ecs/systems/AISystem'
 import type { BuildingComponent, EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
@@ -197,14 +197,24 @@ export const useGameStore = create<GameStore>()(
 
 			// Player 1 starting base
 			spawnStartingBase(
-				factory, 'player1', 'team1', playerFaction,
-				map.player1.base, map.player1.minerals, map.player1.gasGeyser,
+				factory,
+				'player1',
+				'team1',
+				playerFaction,
+				map.player1.base,
+				map.player1.minerals,
+				map.player1.gasGeyser,
 			)
 
 			// Player 2 (AI) starting base
 			spawnStartingBase(
-				factory, 'player2', 'team2', aiFaction,
-				map.player2.base, map.player2.minerals, map.player2.gasGeyser,
+				factory,
+				'player2',
+				'team2',
+				aiFaction,
+				map.player2.base,
+				map.player2.minerals,
+				map.player2.gasGeyser,
 			)
 
 			// Set camera to player 1's base

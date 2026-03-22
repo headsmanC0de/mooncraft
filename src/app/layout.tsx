@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 	metadataBase: new URL('https://mooncraft.game'),
 	openGraph: {
 		title: `${GAME_CONFIG.branding.name} - Online RTS`,
-		description: 'Free-to-play competitive real-time strategy game with 3D graphics and multiplayer.',
+		description:
+			'Free-to-play competitive real-time strategy game with 3D graphics and multiplayer.',
 		type: 'website',
 		locale: 'en_US',
 	},

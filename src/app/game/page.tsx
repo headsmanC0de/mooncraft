@@ -1,9 +1,8 @@
 'use client'
 
-import { Component, type ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Component, type ReactNode, Suspense } from 'react'
 import { HUD } from '@/components/hud/HUD'
 import { useGameStore } from '@/stores/gameStore'
 
@@ -52,8 +51,8 @@ class GameErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundary
 						Failed to Load Game
 					</h1>
 					<p style={{ color: '#9ca3af', marginBottom: '1rem', maxWidth: '400px' }}>
-						Your browser may not support WebGL, or the graphics driver crashed. Try
-						refreshing or using a different browser.
+						Your browser may not support WebGL, or the graphics driver crashed. Try refreshing or
+						using a different browser.
 					</p>
 					<button
 						type="button"
