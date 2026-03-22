@@ -135,6 +135,7 @@ export default function Home() {
 					</Link>
 
 					<button
+						type="button"
 						disabled
 						style={{
 							display: 'flex',
