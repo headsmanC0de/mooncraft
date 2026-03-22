@@ -48,6 +48,7 @@ function CommandButton({ label, onClick }: { label: string; onClick?: () => void
 export function CommandPanel() {
 	const selectedUnits = useGameStore((s) => s.selectedUnits)
 	const setPlacementMode = useGameStore((s) => s.setPlacementMode)
+	const trainUnit = useGameStore((s) => s.trainUnit)
 	const [showBuildMenu, setShowBuildMenu] = useState(false)
 
 	const handleBuildClick = useCallback(
@@ -56,6 +57,13 @@ export function CommandPanel() {
 			setShowBuildMenu(false)
 		},
 		[setPlacementMode],
+	)
+
+	const handleTrainClick = useCallback(
+		(buildingId: string, unitType: string) => {
+			trainUnit(buildingId, unitType)
+		},
+		[trainUnit],
 	)
 
 	if (selectedUnits.length === 0) return null
@@ -95,7 +103,13 @@ export function CommandPanel() {
 				>
 					{produces.map((unitType) => {
 						const unitDef = UNIT_DEFINITIONS[unitType]
-						return <CommandButton key={unitType} label={`Train\n${unitDef?.name ?? unitType}`} />
+						return (
+							<CommandButton
+								key={unitType}
+								label={`Train\n${unitDef?.name ?? unitType}`}
+								onClick={() => handleTrainClick(firstId, unitType)}
+							/>
+						)
 					})}
 				</div>
 			</div>

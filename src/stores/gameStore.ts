@@ -12,11 +12,20 @@ import {
 	EntityFactory,
 	entityManager,
 	MovementSystem,
+	ProductionSystem,
 	ResourceSystem,
 	systemManager,
 } from '@/lib/ecs'
 import { getBuildingDef } from '@/config/buildings'
-import type { EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
+import { getUnitDef } from '@/config/units'
+import type {
+	BuildingComponent,
+	EntityId,
+	GameState,
+	OwnerComponent,
+	PlayerState,
+	Vector3,
+} from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
 interface GameStore extends GameState {
@@ -38,6 +47,7 @@ interface GameStore extends GameState {
 	moveSelectedUnits: (target: Vector3) => void
 	setPlacementMode: (mode: string | null) => void
 	placeBuilding: (buildingType: string, position: Vector3) => void
+	trainUnit: (buildingId: EntityId, unitType: string) => void
 	setCameraPosition: (pos: { x: number; y: number; z: number }) => void
 	setCameraZoom: (zoom: number) => void
 	pause: () => void
@@ -64,7 +74,24 @@ export const useGameStore = create<GameStore>()(
 			systemManager.registerSystem(new MovementSystem())
 			systemManager.registerSystem(new BuildingSystem())
 			systemManager.registerSystem(new CombatSystem())
-			systemManager.registerSystem(new ResourceSystem())
+			systemManager.registerSystem(new ProductionSystem())
+			const resourceSystem = new ResourceSystem()
+			resourceSystem.setDepositCallback((playerId, amount) => {
+				const state = useGameStore.getState()
+				const player = state.players.get(playerId)
+				if (player) {
+					const players = new Map(state.players)
+					players.set(playerId, {
+						...player,
+						resources: {
+							...player.resources,
+							minerals: player.resources.minerals + amount,
+						},
+					})
+					useGameStore.setState({ players })
+				}
+			})
+			systemManager.registerSystem(resourceSystem)
 
 			// Initialize players
 			const players = new Map<string, PlayerState>()
@@ -212,6 +239,91 @@ export const useGameStore = create<GameStore>()(
 			factory.createBuilding(buildingType, 'player1', 'team1', position)
 
 			set({ players: updatedPlayers, placementMode: null })
+		},
+
+		trainUnit: (buildingId, unitType) => {
+			const state = get()
+			const player = state.players.get('player1')
+			if (!player) return
+
+			const unitDef = getUnitDef(unitType)
+			const building = componentManager.getComponent<BuildingComponent>(
+				buildingId,
+				ComponentType.BUILDING,
+			)
+			if (!building || building.buildProgress < 1) return
+
+			// Check resources
+			if (
+				player.resources.minerals < unitDef.cost.minerals ||
+				player.resources.gas < unitDef.cost.gas
+			) {
+				return
+			}
+
+			// Check supply
+			const allEntities = entityManager.getAllEntities()
+			let supplyUsed = 0
+			let supplyMax = 0
+
+			for (const entity of allEntities) {
+				const owner = entity.components.get(ComponentType.OWNER) as OwnerComponent | undefined
+				if (!owner || owner.playerId !== 'player1') continue
+
+				const bldg = entity.components.get(ComponentType.BUILDING) as BuildingComponent | undefined
+				if (bldg) {
+					if (bldg.buildProgress >= 1) {
+						const bldgDef = getBuildingDef(bldg.buildingType)
+						supplyMax += bldgDef.supplyProvided
+					}
+				} else {
+					// It's a unit - count its supply cost
+					const movement = entity.components.get(ComponentType.MOVEMENT)
+					if (movement) {
+						// Try to figure out the unit type from render color or other means
+						// For simplicity, each unit with movement costs 1 supply by default
+						// We check known unit types
+						const health = entity.components.get(ComponentType.HEALTH) as
+							| { current: number; max: number }
+							| undefined
+						const combat = entity.components.get(ComponentType.COMBAT) as
+							| { attackDamage: number }
+							| undefined
+						if (health) {
+							// Match by max health to determine unit type
+							if (health.max === 160) {
+								supplyUsed += 3 // siege_tank
+							} else if (health.max === 150) {
+								supplyUsed += 2 // medivac
+							} else {
+								supplyUsed += 1 // worker or marine
+							}
+						}
+					}
+				}
+			}
+
+			if (supplyUsed + unitDef.cost.supply > supplyMax) return
+
+			// Deduct resources
+			const updatedPlayers = new Map(state.players)
+			updatedPlayers.set('player1', {
+				...player,
+				resources: {
+					...player.resources,
+					minerals: player.resources.minerals - unitDef.cost.minerals,
+					gas: player.resources.gas - unitDef.cost.gas,
+				},
+			})
+
+			// Add to building queue
+			building.queue.push({
+				type: unitType,
+				progress: 0,
+				duration: unitDef.buildTime,
+			})
+
+			set({ players: updatedPlayers })
 		},
 
 		setCameraPosition: (pos) => set({ cameraPosition: pos }),

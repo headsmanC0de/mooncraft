@@ -5,6 +5,7 @@
 import {
 	ComponentType,
 	type Entity,
+	type OwnerComponent,
 	type ResourceCarrierComponent,
 	type ResourceComponent,
 } from '@/types/ecs'
@@ -15,16 +16,23 @@ import type { ComponentManager } from '../ComponentManager'
 import { componentManager as defaultComponentManager } from '../ComponentManager'
 import { System } from '../SystemManager'
 
+export type DepositCallback = (playerId: string, amount: number) => void
+
 export class ResourceSystem extends System {
 	readonly requiredComponents = [ComponentType.RESOURCE_CARRIER, ComponentType.TRANSFORM] as ComponentType[]
 	readonly priority = 8
 	private entityManager: EntityManager
 	private componentManager: ComponentManager
+	private onDeposit: DepositCallback | null = null
 
 	constructor(entityManager?: EntityManager, componentManager?: ComponentManager) {
 		super()
 		this.entityManager = entityManager ?? defaultEntityManager
 		this.componentManager = componentManager ?? defaultComponentManager
+	}
+
+	setDepositCallback(callback: DepositCallback): void {
+		this.onDeposit = callback
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -37,15 +45,24 @@ export class ResourceSystem extends System {
 					this.processGathering(carrier, deltaTime)
 					break
 				case 'returning':
-					// Simplified: instant return, reset load, go back to gathering
-					carrier.currentLoad = 0
-					carrier.state = carrier.targetResourceId ? 'gathering' : 'idle'
+					this.processReturning(entity, carrier)
 					break
 				case 'idle':
 				case 'moving_to_resource':
 					break
 			}
 		}
+	}
+
+	private processReturning(entity: Entity, carrier: ResourceCarrierComponent): void {
+		if (carrier.currentLoad > 0 && this.onDeposit) {
+			const owner = entity.components.get(ComponentType.OWNER) as OwnerComponent
+			if (owner) {
+				this.onDeposit(owner.playerId, carrier.currentLoad)
+			}
+		}
+		carrier.currentLoad = 0
+		carrier.state = carrier.targetResourceId ? 'gathering' : 'idle'
 	}
 
 	private processGathering(carrier: ResourceCarrierComponent, deltaTime: number): void {

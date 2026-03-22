@@ -11,4 +11,5 @@ export { BuildingSystem } from './systems/BuildingSystem'
 export { CombatSystem } from './systems/CombatSystem'
 // Systems
 export { MovementSystem } from './systems/MovementSystem'
+export { ProductionSystem } from './systems/ProductionSystem'
 export { ResourceSystem } from './systems/ResourceSystem'
