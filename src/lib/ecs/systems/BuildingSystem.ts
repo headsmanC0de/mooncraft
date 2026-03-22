@@ -1,6 +1,6 @@
-import { ComponentType } from '@/types/ecs'
-import type { Entity, BuildingComponent, HealthComponent } from '@/types/ecs'
 import { getBuildingDef } from '@/config/buildings'
+import type { BuildingComponent, Entity, HealthComponent } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 import { System } from '../SystemManager'
 
 export class BuildingSystem extends System {
@@ -9,7 +9,9 @@ export class BuildingSystem extends System {
 
 	update(entities: Entity[], deltaTime: number): void {
 		for (const entity of entities) {
-			const building = entity.components.get(ComponentType.BUILDING) as BuildingComponent | undefined
+			const building = entity.components.get(ComponentType.BUILDING) as
+				| BuildingComponent
+				| undefined
 			const health = entity.components.get(ComponentType.HEALTH) as HealthComponent | undefined
 			if (!building || !health) continue
 			if (building.buildProgress >= 1) continue

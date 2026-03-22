@@ -3,7 +3,9 @@
  * Phases: BUILD (0-120s), EXPAND (120-300s), ATTACK (300s+)
  */
 
-import { ComponentType } from '@/types/ecs'
+import { getBuildingDef } from '@/config/buildings'
+import { getUnitDef } from '@/config/units'
+import { useGameStore } from '@/stores/gameStore'
 import type {
 	BuildingComponent,
 	CombatComponent,
@@ -13,15 +15,13 @@ import type {
 	ResourceCarrierComponent,
 	TransformComponent,
 } from '@/types/ecs'
-import { getBuildingDef } from '@/config/buildings'
-import { getUnitDef } from '@/config/units'
-import { System } from '../SystemManager'
+import { ComponentType } from '@/types/ecs'
+import type { ComponentManager } from '../ComponentManager'
+import { componentManager as defaultCM } from '../ComponentManager'
 import { EntityFactory } from '../EntityFactory'
 import type { EntityManager } from '../EntityManager'
 import { entityManager as defaultEM } from '../EntityManager'
-import type { ComponentManager } from '../ComponentManager'
-import { componentManager as defaultCM } from '../ComponentManager'
-import { useGameStore } from '@/stores/gameStore'
+import { System } from '../SystemManager'
 
 export class AISystem extends System {
 	readonly requiredComponents = [ComponentType.OWNER]
@@ -89,12 +89,16 @@ export class AISystem extends System {
 		let max = 0
 
 		for (const entity of aiEntities) {
-			const building = entity.components.get(ComponentType.BUILDING) as BuildingComponent | undefined
+			const building = entity.components.get(ComponentType.BUILDING) as
+				| BuildingComponent
+				| undefined
 			if (building && building.buildProgress >= 1) {
 				const def = getBuildingDef(building.buildingType)
 				max += def.supplyProvided
 			} else if (!building) {
-				const movement = entity.components.get(ComponentType.MOVEMENT) as MovementComponent | undefined
+				const movement = entity.components.get(ComponentType.MOVEMENT) as
+					| MovementComponent
+					| undefined
 				if (movement) {
 					const health = entity.components.get(ComponentType.HEALTH) as
 						| { current: number; max: number }
@@ -204,7 +208,9 @@ export class AISystem extends System {
 
 		for (const worker of workers) {
 			const mineral = minerals[Math.floor(Math.random() * minerals.length)]
-			const carrier = worker.components.get(ComponentType.RESOURCE_CARRIER) as ResourceCarrierComponent
+			const carrier = worker.components.get(
+				ComponentType.RESOURCE_CARRIER,
+			) as ResourceCarrierComponent
 			carrier.state = 'gathering'
 			carrier.targetResourceId = mineral.id
 
@@ -304,7 +310,9 @@ export class AISystem extends System {
 
 			// Find nearest player1 entity to set combat target
 			const combat = unit.components.get(ComponentType.COMBAT) as CombatComponent | undefined
-			const transform = unit.components.get(ComponentType.TRANSFORM) as TransformComponent | undefined
+			const transform = unit.components.get(ComponentType.TRANSFORM) as
+				| TransformComponent
+				| undefined
 			if (combat && transform && !combat.targetId) {
 				const allEntities = this.em.getAllEntities()
 				let nearest: Entity | null = null

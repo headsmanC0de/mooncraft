@@ -3,13 +3,13 @@
  * KISS: Simple factory methods for common entity types
  */
 
-import type { EntityId, Vector3 } from '@/types/ecs'
-import { ComponentType } from '@/types/ecs'
-import { getUnitDef } from '@/config/units'
 import { getBuildingDef } from '@/config/buildings'
 import { GAME_CONFIG } from '@/config/game'
-import type { EntityManager } from './EntityManager'
+import { getUnitDef } from '@/config/units'
+import type { EntityId, Vector3 } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 import type { ComponentManager } from './ComponentManager'
+import type { EntityManager } from './EntityManager'
 
 export class EntityFactory {
 	constructor(

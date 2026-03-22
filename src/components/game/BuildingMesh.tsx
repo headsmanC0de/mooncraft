@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
 import type { Group } from 'three'
 import type {
 	BuildingComponent,
@@ -64,11 +64,7 @@ export function BuildingMesh({
 			{!isBuilding && (
 				<mesh castShadow position={[0, transform.scale.y + 0.25, 0]}>
 					<coneGeometry args={[Math.min(scaleX, scaleZ) * 0.6, 0.5, 4]} />
-					<meshStandardMaterial
-						color={render.color ?? '#888888'}
-						metalness={0.3}
-						roughness={0.7}
-					/>
+					<meshStandardMaterial color={render.color ?? '#888888'} metalness={0.3} roughness={0.7} />
 				</mesh>
 			)}
 

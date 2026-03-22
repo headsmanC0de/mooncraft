@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { EntityManager } from '../EntityManager'
+import { beforeEach, describe, expect, it } from 'vitest'
+import type { MovementComponent, TransformComponent } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 import { ComponentManager } from '../ComponentManager'
 import { EntityFactory } from '../EntityFactory'
+import { EntityManager } from '../EntityManager'
 import { MovementSystem } from '../systems/MovementSystem'
-import type { TransformComponent, MovementComponent } from '@/types/ecs'
-import { ComponentType } from '@/types/ecs'
 
 describe('MovementSystem', () => {
 	let em: EntityManager

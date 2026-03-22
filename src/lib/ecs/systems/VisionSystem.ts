@@ -13,7 +13,11 @@ import {
 import { System } from '../SystemManager'
 
 export class VisionSystem extends System {
-	readonly requiredComponents = [ComponentType.TRANSFORM, ComponentType.OWNER, ComponentType.RENDER] as ComponentType[]
+	readonly requiredComponents = [
+		ComponentType.TRANSFORM,
+		ComponentType.OWNER,
+		ComponentType.RENDER,
+	] as ComponentType[]
 	readonly priority = 45
 
 	update(entities: Entity[], _deltaTime: number): void {

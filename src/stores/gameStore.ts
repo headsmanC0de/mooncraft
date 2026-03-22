@@ -5,6 +5,8 @@
 
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
+import { getBuildingDef } from '@/config/buildings'
+import { getUnitDef } from '@/config/units'
 import {
 	AISystem,
 	BuildingSystem,
@@ -15,11 +17,9 @@ import {
 	MovementSystem,
 	ProductionSystem,
 	ResourceSystem,
-	VisionSystem,
 	systemManager,
+	VisionSystem,
 } from '@/lib/ecs'
-import { getBuildingDef } from '@/config/buildings'
-import { getUnitDef } from '@/config/units'
 import type { GameStatus } from '@/lib/game/GameManager'
 import type {
 	BuildingComponent,
@@ -224,10 +224,7 @@ export const useGameStore = create<GameStore>()(
 			const def = getBuildingDef(buildingType)
 
 			// Check resources
-			if (
-				player.resources.minerals < def.cost.minerals ||
-				player.resources.gas < def.cost.gas
-			) {
+			if (player.resources.minerals < def.cost.minerals || player.resources.gas < def.cost.gas) {
 				return // Not enough resources
 			}
 
@@ -295,7 +292,7 @@ export const useGameStore = create<GameStore>()(
 						const health = entity.components.get(ComponentType.HEALTH) as
 							| { current: number; max: number }
 							| undefined
-						const combat = entity.components.get(ComponentType.COMBAT) as
+						const _combat = entity.components.get(ComponentType.COMBAT) as
 							| { attackDamage: number }
 							| undefined
 						if (health) {

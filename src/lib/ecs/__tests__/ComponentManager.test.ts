@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { EntityManager } from '../EntityManager'
-import { ComponentManager } from '../ComponentManager'
-import type { TransformComponent, HealthComponent } from '@/types/ecs'
+import { beforeEach, describe, expect, it } from 'vitest'
+import type { HealthComponent, TransformComponent } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
+import { ComponentManager } from '../ComponentManager'
+import { EntityManager } from '../EntityManager'
 
 describe('ComponentManager', () => {
 	let em: EntityManager

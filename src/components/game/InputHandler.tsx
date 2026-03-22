@@ -1,12 +1,17 @@
 'use client'
 
-import { useCallback, useRef, useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
+import { useCallback, useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { componentManager, entityManager } from '@/lib/ecs'
 import { useGameStore } from '@/stores/gameStore'
-import { entityManager, componentManager } from '@/lib/ecs'
+import type {
+	CombatComponent,
+	OwnerComponent,
+	ResourceComponent,
+	TransformComponent,
+} from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
-import type { TransformComponent, OwnerComponent, ResourceComponent, CombatComponent } from '@/types/ecs'
 
 export function InputHandler() {
 	const { camera, gl } = useThree()
@@ -16,36 +21,45 @@ export function InputHandler() {
 	const groundPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0))
 
 	// Helper: get world position from mouse event (raycast to ground plane)
-	const getGroundPosition = useCallback((event: MouseEvent): THREE.Vector3 | null => {
-		const rect = gl.domElement.getBoundingClientRect()
-		mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-		mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-		raycaster.current.setFromCamera(mouse.current, camera)
-		const intersection = new THREE.Vector3()
-		const hit = raycaster.current.ray.intersectPlane(groundPlane.current, intersection)
-		return hit ? intersection : null
-	}, [camera, gl])
+	const getGroundPosition = useCallback(
+		(event: MouseEvent): THREE.Vector3 | null => {
+			const rect = gl.domElement.getBoundingClientRect()
+			mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+			mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+			raycaster.current.setFromCamera(mouse.current, camera)
+			const intersection = new THREE.Vector3()
+			const hit = raycaster.current.ray.intersectPlane(groundPlane.current, intersection)
+			return hit ? intersection : null
+		},
+		[camera, gl],
+	)
 
 	// Helper: find entity near world position
-	const findEntityAtPosition = useCallback((worldPos: THREE.Vector3, maxDist = 2): string | null => {
-		let closestId: string | null = null
-		let closestDist = maxDist
+	const findEntityAtPosition = useCallback(
+		(worldPos: THREE.Vector3, maxDist = 2): string | null => {
+			let closestId: string | null = null
+			let closestDist = maxDist
 
-		const entities = entityManager.getAllEntities()
-		for (const entity of entities) {
-			const transform = componentManager.getComponent<TransformComponent>(entity.id, ComponentType.TRANSFORM)
-			if (!transform) continue
+			const entities = entityManager.getAllEntities()
+			for (const entity of entities) {
+				const transform = componentManager.getComponent<TransformComponent>(
+					entity.id,
+					ComponentType.TRANSFORM,
+				)
+				if (!transform) continue
 
-			const dx = transform.position.x - worldPos.x
-			const dz = transform.position.z - worldPos.z
-			const dist = Math.sqrt(dx * dx + dz * dz)
-			if (dist < closestDist) {
-				closestDist = dist
-				closestId = entity.id
+				const dx = transform.position.x - worldPos.x
+				const dz = transform.position.z - worldPos.z
+				const dist = Math.sqrt(dx * dx + dz * dz)
+				if (dist < closestDist) {
+					closestDist = dist
+					closestId = entity.id
+				}
 			}
-		}
-		return closestId
-	}, [])
+			return closestId
+		},
+		[],
+	)
 
 	useEffect(() => {
 		const canvas = gl.domElement
@@ -91,10 +105,16 @@ export function InputHandler() {
 					const projected = new THREE.Vector3()
 
 					for (const entity of entities) {
-						const transform = componentManager.getComponent<TransformComponent>(entity.id, ComponentType.TRANSFORM)
+						const transform = componentManager.getComponent<TransformComponent>(
+							entity.id,
+							ComponentType.TRANSFORM,
+						)
 						if (!transform) continue
 
-						const owner = componentManager.getComponent<OwnerComponent>(entity.id, ComponentType.OWNER)
+						const owner = componentManager.getComponent<OwnerComponent>(
+							entity.id,
+							ComponentType.OWNER,
+						)
 						if (!owner || owner.teamId !== 'team1') continue
 
 						projected.set(transform.position.x, transform.position.y, transform.position.z)
@@ -127,11 +147,14 @@ export function InputHandler() {
 			const targetId = findEntityAtPosition(worldPos)
 			if (targetId) {
 				const owner = componentManager.getComponent<OwnerComponent>(targetId, ComponentType.OWNER)
-				const resource = componentManager.getComponent<ResourceComponent>(targetId, ComponentType.RESOURCE)
+				const resource = componentManager.getComponent<ResourceComponent>(
+					targetId,
+					ComponentType.RESOURCE,
+				)
 
 				if (resource) {
 					// Right-click on mineral — send workers to gather
-					store.selectedUnits.forEach(unitId => {
+					store.selectedUnits.forEach((unitId) => {
 						const carrier = componentManager.getComponent(unitId, ComponentType.RESOURCE_CARRIER)
 						if (carrier) {
 							componentManager.updateComponent(unitId, ComponentType.RESOURCE_CARRIER, {
@@ -140,7 +163,10 @@ export function InputHandler() {
 								gatherTimer: 0,
 							})
 							// Move worker to mineral position
-							const targetTransform = componentManager.getComponent<TransformComponent>(targetId, ComponentType.TRANSFORM)
+							const targetTransform = componentManager.getComponent<TransformComponent>(
+								targetId,
+								ComponentType.TRANSFORM,
+							)
 							if (targetTransform) {
 								componentManager.updateComponent(unitId, ComponentType.MOVEMENT, {
 									targetPosition: { ...targetTransform.position },
@@ -153,14 +179,20 @@ export function InputHandler() {
 
 				if (owner && owner.teamId !== 'team1') {
 					// Right-click on enemy — attack
-					store.selectedUnits.forEach(unitId => {
-						const combat = componentManager.getComponent<CombatComponent>(unitId, ComponentType.COMBAT)
+					store.selectedUnits.forEach((unitId) => {
+						const combat = componentManager.getComponent<CombatComponent>(
+							unitId,
+							ComponentType.COMBAT,
+						)
 						if (combat) {
 							componentManager.updateComponent(unitId, ComponentType.COMBAT, {
 								targetId: targetId,
 							})
 							// Move toward enemy
-							const targetTransform = componentManager.getComponent<TransformComponent>(targetId, ComponentType.TRANSFORM)
+							const targetTransform = componentManager.getComponent<TransformComponent>(
+								targetId,
+								ComponentType.TRANSFORM,
+							)
 							if (targetTransform) {
 								componentManager.updateComponent(unitId, ComponentType.MOVEMENT, {
 									targetPosition: { ...targetTransform.position },

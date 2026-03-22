@@ -5,8 +5,8 @@
  */
 
 import { entityManager } from '@/lib/ecs'
-import { ComponentType } from '@/types/ecs'
 import type { BuildingComponent, OwnerComponent } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 
 export type GameStatus = 'playing' | 'victory' | 'defeat'
 

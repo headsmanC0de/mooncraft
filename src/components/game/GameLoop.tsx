@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useGameStore } from '@/stores/gameStore'
+import { useEffect, useRef } from 'react'
 import { checkGameStatus } from '@/lib/game/GameManager'
+import { useGameStore } from '@/stores/gameStore'
 
 export function GameLoop() {
 	const initialized = useRef(false)

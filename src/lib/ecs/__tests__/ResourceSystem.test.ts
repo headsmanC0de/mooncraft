@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { EntityManager } from '../EntityManager'
+import { beforeEach, describe, expect, it } from 'vitest'
+import type { ResourceCarrierComponent, ResourceComponent } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 import { ComponentManager } from '../ComponentManager'
 import { EntityFactory } from '../EntityFactory'
+import { EntityManager } from '../EntityManager'
 import { ResourceSystem } from '../systems/ResourceSystem'
-import { ComponentType } from '@/types/ecs'
-import type { ResourceCarrierComponent, ResourceComponent } from '@/types/ecs'
 
 describe('ResourceSystem', () => {
 	let em: EntityManager
@@ -31,7 +31,10 @@ describe('ResourceSystem', () => {
 		const entities = em.queryEntities(ComponentType.RESOURCE_CARRIER, ComponentType.TRANSFORM)
 		system.update(entities, 2.5)
 
-		const carrier = cm.getComponent<ResourceCarrierComponent>(workerId, ComponentType.RESOURCE_CARRIER)
+		const carrier = cm.getComponent<ResourceCarrierComponent>(
+			workerId,
+			ComponentType.RESOURCE_CARRIER,
+		)
 		expect(carrier!.currentLoad).toBeGreaterThan(0)
 	})
 
@@ -62,7 +65,10 @@ describe('ResourceSystem', () => {
 		// Run enough time to fill capacity
 		system.update(entities, 10)
 
-		const carrier = cm.getComponent<ResourceCarrierComponent>(workerId, ComponentType.RESOURCE_CARRIER)
+		const carrier = cm.getComponent<ResourceCarrierComponent>(
+			workerId,
+			ComponentType.RESOURCE_CARRIER,
+		)
 		// Should have cycled through returning and back to gathering
 		expect(carrier!.currentLoad).toBeDefined()
 	})
@@ -78,7 +84,10 @@ describe('ResourceSystem', () => {
 		const entities = em.queryEntities(ComponentType.RESOURCE_CARRIER, ComponentType.TRANSFORM)
 		system.update(entities, 10)
 
-		const carrier = cm.getComponent<ResourceCarrierComponent>(workerId, ComponentType.RESOURCE_CARRIER)
+		const _carrier = cm.getComponent<ResourceCarrierComponent>(
+			workerId,
+			ComponentType.RESOURCE_CARRIER,
+		)
 		const resource = cm.getComponent<ResourceComponent>(mineralId, ComponentType.RESOURCE)
 		expect(resource!.amount).toBe(0)
 	})

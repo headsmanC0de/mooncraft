@@ -2,6 +2,7 @@
  * Resource System - Handles worker resource gathering
  */
 
+import { GAME_CONFIG } from '@/config/game'
 import {
 	ComponentType,
 	type Entity,
@@ -9,17 +10,19 @@ import {
 	type ResourceCarrierComponent,
 	type ResourceComponent,
 } from '@/types/ecs'
-import { GAME_CONFIG } from '@/config/game'
-import type { EntityManager } from '../EntityManager'
-import { entityManager as defaultEntityManager } from '../EntityManager'
 import type { ComponentManager } from '../ComponentManager'
 import { componentManager as defaultComponentManager } from '../ComponentManager'
+import type { EntityManager } from '../EntityManager'
+import { entityManager as defaultEntityManager } from '../EntityManager'
 import { System } from '../SystemManager'
 
 export type DepositCallback = (playerId: string, amount: number) => void
 
 export class ResourceSystem extends System {
-	readonly requiredComponents = [ComponentType.RESOURCE_CARRIER, ComponentType.TRANSFORM] as ComponentType[]
+	readonly requiredComponents = [
+		ComponentType.RESOURCE_CARRIER,
+		ComponentType.TRANSFORM,
+	] as ComponentType[]
 	readonly priority = 8
 	private entityManager: EntityManager
 	private componentManager: ComponentManager
@@ -37,7 +40,9 @@ export class ResourceSystem extends System {
 
 	update(entities: Entity[], deltaTime: number): void {
 		for (const entity of entities) {
-			const carrier = entity.components.get(ComponentType.RESOURCE_CARRIER) as ResourceCarrierComponent
+			const carrier = entity.components.get(
+				ComponentType.RESOURCE_CARRIER,
+			) as ResourceCarrierComponent
 			if (!carrier) continue
 
 			switch (carrier.state) {
@@ -86,7 +91,11 @@ export class ResourceSystem extends System {
 
 		if (carrier.gatherTimer >= interval) {
 			carrier.gatherTimer -= interval
-			const amount = Math.min(carrier.gatherRate, resource.amount, carrier.maxCapacity - carrier.currentLoad)
+			const amount = Math.min(
+				carrier.gatherRate,
+				resource.amount,
+				carrier.maxCapacity - carrier.currentLoad,
+			)
 			resource.amount -= amount
 			carrier.currentLoad += amount
 

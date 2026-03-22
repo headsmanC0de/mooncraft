@@ -37,6 +37,7 @@ export function GameOverScreen({ status }: GameOverScreenProps) {
 				{isVictory ? 'VICTORY' : 'DEFEAT'}
 			</h1>
 			<button
+				type="button"
 				onClick={() => window.location.reload()}
 				style={{
 					padding: '16px 48px',

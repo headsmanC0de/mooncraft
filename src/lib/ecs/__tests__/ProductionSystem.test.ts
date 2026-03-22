@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { EntityManager } from '../EntityManager'
+import { beforeEach, describe, expect, it } from 'vitest'
+import type { BuildingComponent } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 import { ComponentManager } from '../ComponentManager'
 import { EntityFactory } from '../EntityFactory'
+import { EntityManager } from '../EntityManager'
 import { ProductionSystem } from '../systems/ProductionSystem'
-import { ComponentType } from '@/types/ecs'
-import type { BuildingComponent } from '@/types/ecs'
 
 describe('ProductionSystem', () => {
 	let em: EntityManager

@@ -1,8 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import { GAME_CONFIG } from '@/config'
 import * as THREE from 'three'
+import { GAME_CONFIG } from '@/config'
 
 export function Terrain() {
 	const { width, height } = GAME_CONFIG.map
@@ -25,9 +25,10 @@ export function Terrain() {
 		// Subtle noise-like color variation
 		for (let x = 0; x < size; x += 4) {
 			for (let y = 0; y < size; y += 4) {
-				const noise = Math.sin(x * 0.05) * Math.cos(y * 0.07) * 0.5
-					+ Math.sin(x * 0.13 + y * 0.09) * 0.3
-					+ Math.random() * 0.2
+				const noise =
+					Math.sin(x * 0.05) * Math.cos(y * 0.07) * 0.5 +
+					Math.sin(x * 0.13 + y * 0.09) * 0.3 +
+					Math.random() * 0.2
 				const brightness = Math.floor(28 + noise * 12)
 				const green = Math.floor(42 + noise * 16)
 				ctx.fillStyle = `rgb(${brightness}, ${green}, ${brightness})`

@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
 	BUILDING_DEFINITIONS,
 	GAME_CONFIG,
-	UNIT_DEFINITIONS,
 	getBuildingDef,
 	getUnitDef,
+	UNIT_DEFINITIONS,
 } from '@/config'
 
 describe('Unit Definitions', () => {

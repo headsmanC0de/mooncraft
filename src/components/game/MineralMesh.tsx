@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
 import type { Group } from 'three'
 import type { ResourceComponent, TransformComponent } from '@/types/ecs'
 
@@ -14,9 +14,7 @@ export function MineralMesh({ transform, resource }: MineralMeshProps) {
 	const groupRef = useRef<Group>(null)
 	const isDepleted = resource.amount <= 0
 	const resourceScale =
-		resource.maxCapacity > 0
-			? 0.4 + 0.6 * (resource.amount / resource.maxCapacity)
-			: 1
+		resource.maxCapacity > 0 ? 0.4 + 0.6 * (resource.amount / resource.maxCapacity) : 1
 
 	useFrame((_, delta) => {
 		if (groupRef.current) {

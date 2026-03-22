@@ -1,12 +1,12 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { Terrain } from './Terrain'
-import { GameCamera } from './GameCamera'
+import { BuildingPlacer } from './BuildingPlacer'
 import { EntityRenderer } from './EntityRenderer'
+import { GameCamera } from './GameCamera'
 import { GameLoop } from './GameLoop'
 import { InputHandler } from './InputHandler'
-import { BuildingPlacer } from './BuildingPlacer'
+import { Terrain } from './Terrain'
 
 export function GameCanvas() {
 	return (

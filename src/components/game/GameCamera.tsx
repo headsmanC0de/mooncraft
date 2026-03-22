@@ -1,10 +1,10 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
-import { useThree, useFrame } from '@react-three/fiber'
-import { useGameStore } from '@/stores/gameStore'
-import { GAME_CONFIG } from '@/config'
+import { useFrame, useThree } from '@react-three/fiber'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { GAME_CONFIG } from '@/config'
+import { useGameStore } from '@/stores/gameStore'
 
 const keys = new Set<string>()
 
@@ -58,11 +58,7 @@ export function GameCamera() {
 		target.current.x = THREE.MathUtils.clamp(target.current.x, 0, width)
 		target.current.z = THREE.MathUtils.clamp(target.current.z, 0, height)
 
-		camera.position.set(
-			target.current.x + zoom * 0.7,
-			zoom,
-			target.current.z + zoom * 0.7,
-		)
+		camera.position.set(target.current.x + zoom * 0.7, zoom, target.current.z + zoom * 0.7)
 		camera.lookAt(target.current)
 
 		useGameStore.getState().setCameraPosition({

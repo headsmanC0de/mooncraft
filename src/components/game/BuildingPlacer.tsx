@@ -10,11 +10,11 @@
 //    - Exit placement mode
 // 4. ESC or right-click to cancel placement mode
 
-import { useRef, useEffect } from 'react'
-import { useThree, useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { useGameStore } from '@/stores/gameStore'
 import { getBuildingDef } from '@/config/buildings'
+import { useGameStore } from '@/stores/gameStore'
 
 export function BuildingPlacer() {
 	const { camera, gl } = useThree()
@@ -92,12 +92,7 @@ export function BuildingPlacer() {
 	return (
 		<mesh ref={ghostRef} position={[0, 0.5, 0]}>
 			<boxGeometry args={[def.size.width, 1, def.size.height]} />
-			<meshStandardMaterial
-				color={def.color}
-				transparent
-				opacity={0.5}
-				wireframe={false}
-			/>
+			<meshStandardMaterial color={def.color} transparent opacity={0.5} wireframe={false} />
 		</mesh>
 	)
 }

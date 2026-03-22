@@ -1,16 +1,16 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { EntityManager } from '../EntityManager'
-import { ComponentManager } from '../ComponentManager'
-import { EntityFactory } from '../EntityFactory'
+import { beforeEach, describe, expect, it } from 'vitest'
 import type {
-	HealthComponent,
-	TransformComponent,
-	OwnerComponent,
 	BuildingComponent,
-	ResourceComponent,
+	HealthComponent,
+	OwnerComponent,
 	RenderComponent,
+	ResourceComponent,
+	TransformComponent,
 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
+import { ComponentManager } from '../ComponentManager'
+import { EntityFactory } from '../EntityFactory'
+import { EntityManager } from '../EntityManager'
 
 describe('EntityFactory', () => {
 	let em: EntityManager
@@ -98,13 +98,7 @@ describe('EntityFactory', () => {
 		})
 
 		it('should create pre-built building with full progress', () => {
-			const id = factory.createBuilding(
-				'command_center',
-				'p1',
-				't1',
-				{ x: 0, y: 0, z: 0 },
-				true,
-			)
+			const id = factory.createBuilding('command_center', 'p1', 't1', { x: 0, y: 0, z: 0 }, true)
 			const building = cm.getComponent<BuildingComponent>(id, ComponentType.BUILDING)
 			expect(building!.buildProgress).toBe(1)
 			const health = cm.getComponent<HealthComponent>(id, ComponentType.HEALTH)
@@ -127,9 +121,7 @@ describe('EntityFactory', () => {
 		})
 
 		it('should throw for unknown building type', () => {
-			expect(() =>
-				factory.createBuilding('unknown', 'p', 't', { x: 0, y: 0, z: 0 }),
-			).toThrow()
+			expect(() => factory.createBuilding('unknown', 'p', 't', { x: 0, y: 0, z: 0 })).toThrow()
 		})
 	})
 

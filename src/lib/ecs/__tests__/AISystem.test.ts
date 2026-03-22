@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { EntityManager } from '../EntityManager'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { BuildingComponent, MovementComponent } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 import { ComponentManager } from '../ComponentManager'
 import { EntityFactory } from '../EntityFactory'
+import { EntityManager } from '../EntityManager'
 import { AISystem } from '../systems/AISystem'
-import { ComponentType } from '@/types/ecs'
-import type { BuildingComponent, MovementComponent } from '@/types/ecs'
 
 // Mock the game store
 const mockPlayers = new Map()

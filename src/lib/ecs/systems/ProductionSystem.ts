@@ -3,24 +3,21 @@
  * Spawns units when production completes
  */
 
+import type { BuildingComponent, Entity, OwnerComponent } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
-import type { Entity, BuildingComponent, OwnerComponent } from '@/types/ecs'
-import { System } from '../SystemManager'
-import type { EntityManager } from '../EntityManager'
 import type { ComponentManager } from '../ComponentManager'
-import { EntityFactory } from '../EntityFactory'
-import { entityManager as defaultEM } from '../EntityManager'
 import { componentManager as defaultCM } from '../ComponentManager'
+import { EntityFactory } from '../EntityFactory'
+import type { EntityManager } from '../EntityManager'
+import { entityManager as defaultEM } from '../EntityManager'
+import { System } from '../SystemManager'
 
 export class ProductionSystem extends System {
 	readonly requiredComponents = [ComponentType.BUILDING, ComponentType.OWNER]
 	readonly priority = 6
 	private factory: EntityFactory
 
-	constructor(
-		private em: EntityManager = defaultEM,
-		private cm: ComponentManager = defaultCM,
-	) {
+	constructor(em: EntityManager = defaultEM, cm: ComponentManager = defaultCM) {
 		super()
 		this.factory = new EntityFactory(em, cm)
 	}
