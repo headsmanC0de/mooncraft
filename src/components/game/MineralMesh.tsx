@@ -34,15 +34,15 @@ export function MineralMesh({ transform, resource }: MineralMeshProps) {
 
 	if (isGas) {
 		return (
-			<group position={[transform.position.x, transform.position.y + 0.8, transform.position.z]}>
+			<group position={[transform.position.x, transform.position.y + 1.2, transform.position.z]}>
 				<group ref={groupRef} scale={resourceScale}>
 					{/* Main geyser column */}
 					<mesh castShadow>
-						<icosahedronGeometry args={[0.5, 1]} />
+						<icosahedronGeometry args={[1.0, 1]} />
 						<meshStandardMaterial
 							color={color}
 							emissive={emissive}
-							emissiveIntensity={emissiveIntensity}
+							emissiveIntensity={emissiveIntensity * 1.5}
 							roughness={0.2}
 							metalness={0.4}
 							transparent
@@ -52,11 +52,11 @@ export function MineralMesh({ transform, resource }: MineralMeshProps) {
 
 					{/* Inner glow core */}
 					<mesh>
-						<icosahedronGeometry args={[0.3, 1]} />
+						<icosahedronGeometry args={[0.6, 1]} />
 						<meshStandardMaterial
 							color={color}
 							emissive={emissive}
-							emissiveIntensity={0.8}
+							emissiveIntensity={1.2}
 							roughness={0.1}
 							metalness={0.2}
 							transparent
@@ -69,11 +69,11 @@ export function MineralMesh({ transform, resource }: MineralMeshProps) {
 	}
 
 	return (
-		<group position={[transform.position.x, transform.position.y + 0.6, transform.position.z]}>
+		<group position={[transform.position.x, transform.position.y + 0.8, transform.position.z]}>
 			<group ref={groupRef} scale={resourceScale}>
 				{/* Main crystal */}
 				<mesh castShadow>
-					<octahedronGeometry args={[0.6, 0]} />
+					<octahedronGeometry args={[0.8, 0]} />
 					<meshStandardMaterial
 						color={color}
 						emissive={emissive}
@@ -84,8 +84,8 @@ export function MineralMesh({ transform, resource }: MineralMeshProps) {
 				</mesh>
 
 				{/* Secondary crystal (smaller, offset) */}
-				<mesh castShadow position={[0.35, -0.15, 0.2]} rotation={[0.3, 0.5, 0.2]}>
-					<octahedronGeometry args={[0.35, 0]} />
+				<mesh castShadow position={[0.45, -0.2, 0.25]} rotation={[0.3, 0.5, 0.2]}>
+					<octahedronGeometry args={[0.45, 0]} />
 					<meshStandardMaterial
 						color={color}
 						emissive={emissive}
@@ -96,8 +96,8 @@ export function MineralMesh({ transform, resource }: MineralMeshProps) {
 				</mesh>
 
 				{/* Third crystal (smallest, other side) */}
-				<mesh castShadow position={[-0.3, -0.2, -0.15]} rotation={[0.1, -0.4, 0.3]}>
-					<octahedronGeometry args={[0.25, 0]} />
+				<mesh castShadow position={[-0.4, -0.25, -0.2]} rotation={[0.1, -0.4, 0.3]}>
+					<octahedronGeometry args={[0.35, 0]} />
 					<meshStandardMaterial
 						color={color}
 						emissive={emissive}
