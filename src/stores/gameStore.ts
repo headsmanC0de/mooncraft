@@ -15,6 +15,7 @@ import {
 	BuildingSystem,
 	CombatSystem,
 	componentManager,
+	DeathSystem,
 	EntityFactory,
 	entityManager,
 	MovementSystem,
@@ -103,14 +104,20 @@ interface GameStore extends GameState {
 	// Selected map (null = random)
 	selectedMapId: string | null
 
+	// Control groups
+	controlGroups: Map<number, EntityId[]>
+
 	// Actions
 	initializeGame: () => void
 	selectUnits: (ids: EntityId[], additive?: boolean) => void
 	clearSelection: () => void
 	moveSelectedUnits: (target: Vector3) => void
+	stopSelectedUnits: () => void
 	setPlacementMode: (mode: string | null) => void
 	placeBuilding: (buildingType: string, position: Vector3) => void
 	trainUnit: (buildingId: EntityId, unitType: string) => void
+	setControlGroup: (groupNumber: number) => void
+	recallControlGroup: (groupNumber: number) => void
 	setCameraPosition: (pos: { x: number; y: number; z: number }) => void
 	setCameraZoom: (zoom: number) => void
 	pause: () => void
@@ -138,6 +145,7 @@ export const useGameStore = create<GameStore>()(
 		playerFaction: 'terran' as 'terran' | 'protoss',
 		aiDifficulty: 'normal' as AIDifficulty,
 		selectedMapId: null,
+		controlGroups: new Map(),
 
 		initializeGame: () => {
 			// Register systems
@@ -165,6 +173,7 @@ export const useGameStore = create<GameStore>()(
 			systemManager.registerSystem(resourceSystem)
 			systemManager.registerSystem(new AISystem(undefined, undefined, get().aiDifficulty))
 			systemManager.registerSystem(new VisionSystem())
+			systemManager.registerSystem(new DeathSystem())
 
 			// Determine factions based on player selection
 			const playerFaction = get().playerFaction
@@ -292,6 +301,21 @@ export const useGameStore = create<GameStore>()(
 			})
 		},
 
+		stopSelectedUnits: () => {
+			const { selectedUnits } = get()
+			selectedUnits.forEach((id) => {
+				componentManager.updateComponent(id, ComponentType.MOVEMENT, {
+					targetPosition: null,
+					isMoving: false,
+				})
+				if (componentManager.hasComponent(id, ComponentType.COMBAT)) {
+					componentManager.updateComponent(id, ComponentType.COMBAT, {
+						targetId: null,
+					})
+				}
+			})
+		},
+
 		setPlacementMode: (mode) => set({ placementMode: mode }),
 
 		placeBuilding: (buildingType, position) => {
@@ -387,6 +411,25 @@ export const useGameStore = create<GameStore>()(
 
 			audioEngine.playTrain()
 			set({ players: updatedPlayers })
+		},
+
+		setControlGroup: (groupNumber) => {
+			const { selectedUnits, controlGroups } = get()
+			if (selectedUnits.length === 0) return
+			const newGroups = new Map(controlGroups)
+			newGroups.set(groupNumber, [...selectedUnits])
+			set({ controlGroups: newGroups })
+			audioEngine.playClick()
+		},
+
+		recallControlGroup: (groupNumber) => {
+			const { controlGroups } = get()
+			const group = controlGroups.get(groupNumber)
+			if (!group || group.length === 0) return
+			// Filter out dead entities (that no longer exist)
+			const alive = group.filter((id) => entityManager.hasEntity(id))
+			if (alive.length === 0) return
+			get().selectUnits(alive)
 		},
 
 		setCameraPosition: (pos) => set({ cameraPosition: pos }),

@@ -33,6 +33,22 @@ describe('MovementSystem', () => {
 		expect(transform.position.x).toBeGreaterThan(0)
 	})
 
+	it('should push apart units that are too close', () => {
+		const id1 = factory.createUnit('marine', 'p1', 't1', { x: 5, y: 0, z: 5 })
+		const id2 = factory.createUnit('marine', 'p1', 't1', { x: 5, y: 0, z: 5 })
+
+		const entities = em.queryEntities(ComponentType.TRANSFORM, ComponentType.MOVEMENT)
+		system.update(entities, 0.016)
+
+		const t1 = cm.getComponent<TransformComponent>(id1, ComponentType.TRANSFORM)
+		const t2 = cm.getComponent<TransformComponent>(id2, ComponentType.TRANSFORM)
+
+		const dx = t1!.position.x - t2!.position.x
+		const dz = t1!.position.z - t2!.position.z
+		const dist = Math.sqrt(dx * dx + dz * dz)
+		expect(dist).toBeGreaterThan(0)
+	})
+
 	it('should stop when arriving at target', () => {
 		const id = factory.createUnit('marine', 'player1', 'team1', { x: 0, y: 0, z: 0 })
 

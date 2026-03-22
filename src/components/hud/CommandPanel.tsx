@@ -73,6 +73,7 @@ function CommandButton({
 export function CommandPanel() {
 	const selectedUnits = useGameStore((s) => s.selectedUnits)
 	const setPlacementMode = useGameStore((s) => s.setPlacementMode)
+	const stopSelectedUnits = useGameStore((s) => s.stopSelectedUnits)
 	const trainUnit = useGameStore((s) => s.trainUnit)
 	const [showBuildMenu, setShowBuildMenu] = useState(false)
 
@@ -222,12 +223,20 @@ export function CommandPanel() {
 					}}
 				>
 					<CommandButton label="Move" ariaLabel="Move units" />
-					<CommandButton label="Stop" ariaLabel="Stop units" />
-					<CommandButton label="Attack" ariaLabel="Attack" />
-					<CommandButton label="Hold" ariaLabel="Hold position" />
 					<CommandButton
-						label="Build (B)"
-						ariaLabel="Open build menu"
+						label="Stop [S]"
+						ariaLabel="Stop units [S]"
+						onClick={() => stopSelectedUnits()}
+					/>
+					<CommandButton label="Attack [A]" ariaLabel="Attack [A]" />
+					<CommandButton
+						label="Hold [H]"
+						ariaLabel="Hold position [H]"
+						onClick={() => stopSelectedUnits()}
+					/>
+					<CommandButton
+						label="Build [B]"
+						ariaLabel="Open build menu [B]"
 						onClick={() => setShowBuildMenu(true)}
 					/>
 				</div>
@@ -259,9 +268,17 @@ export function CommandPanel() {
 				}}
 			>
 				<CommandButton label="Move" ariaLabel="Move units" />
-				<CommandButton label="Stop" ariaLabel="Stop units" />
-				<CommandButton label="Attack" ariaLabel="Attack" />
-				<CommandButton label="Hold" ariaLabel="Hold position" />
+				<CommandButton
+					label="Stop [S]"
+					ariaLabel="Stop units [S]"
+					onClick={() => stopSelectedUnits()}
+				/>
+				<CommandButton label="Attack [A]" ariaLabel="Attack [A]" />
+				<CommandButton
+					label="Hold [H]"
+					ariaLabel="Hold position [H]"
+					onClick={() => stopSelectedUnits()}
+				/>
 			</div>
 		</div>
 	)

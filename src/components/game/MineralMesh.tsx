@@ -15,16 +15,58 @@ export function MineralMesh({ transform, resource }: MineralMeshProps) {
 	const isDepleted = resource.amount <= 0
 	const resourceScale =
 		resource.maxCapacity > 0 ? 0.4 + 0.6 * (resource.amount / resource.maxCapacity) : 1
+	const isGas = resource.resourceType === 'gas'
 
-	useFrame((_, delta) => {
+	useFrame((state, delta) => {
 		if (groupRef.current) {
-			groupRef.current.rotation.y += delta * 0.5
+			groupRef.current.rotation.y += delta * (isGas ? 0.2 : 0.5)
+			if (isGas) {
+				groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.5) * 0.1
+			}
 		}
 	})
 
-	const color = isDepleted ? '#666666' : '#44aaff'
-	const emissive = isDepleted ? '#222222' : '#2266aa'
+	const baseColor = isGas ? '#44cc44' : '#44aaff'
+	const baseEmissive = isGas ? '#226622' : '#2266aa'
+	const color = isDepleted ? '#666666' : baseColor
+	const emissive = isDepleted ? '#222222' : baseEmissive
 	const emissiveIntensity = isDepleted ? 0.1 : 0.5
+
+	if (isGas) {
+		return (
+			<group position={[transform.position.x, transform.position.y + 0.8, transform.position.z]}>
+				<group ref={groupRef} scale={resourceScale}>
+					{/* Main geyser column */}
+					<mesh castShadow>
+						<icosahedronGeometry args={[0.5, 1]} />
+						<meshStandardMaterial
+							color={color}
+							emissive={emissive}
+							emissiveIntensity={emissiveIntensity}
+							roughness={0.2}
+							metalness={0.4}
+							transparent
+							opacity={0.85}
+						/>
+					</mesh>
+
+					{/* Inner glow core */}
+					<mesh>
+						<icosahedronGeometry args={[0.3, 1]} />
+						<meshStandardMaterial
+							color={color}
+							emissive={emissive}
+							emissiveIntensity={0.8}
+							roughness={0.1}
+							metalness={0.2}
+							transparent
+							opacity={0.6}
+						/>
+					</mesh>
+				</group>
+			</group>
+		)
+	}
 
 	return (
 		<group position={[transform.position.x, transform.position.y + 0.6, transform.position.z]}>

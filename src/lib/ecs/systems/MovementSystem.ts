@@ -22,6 +22,50 @@ export class MovementSystem extends System {
 			if (movement.targetPosition) {
 				this.moveTowards(transform, movement, deltaTime)
 			}
+
+			this.applySeparation(entities, entity, transform)
+		}
+	}
+
+	private applySeparation(
+		entities: Entity[],
+		currentEntity: Entity,
+		transform: TransformComponent,
+	): void {
+		const separationRadius = 1.5
+		const separationForce = 0.5
+
+		let pushX = 0
+		let pushZ = 0
+		let neighbors = 0
+
+		for (const other of entities) {
+			if (other.id === currentEntity.id) continue
+			const otherTransform = other.components.get(ComponentType.TRANSFORM) as TransformComponent
+			if (!otherTransform) continue
+
+			let dx = transform.position.x - otherTransform.position.x
+			let dz = transform.position.z - otherTransform.position.z
+			let dist = Math.sqrt(dx * dx + dz * dz)
+
+			if (dist === 0) {
+				// Nudge in a random-ish direction based on entity ids
+				const angle = (currentEntity.id.charCodeAt(0) - other.id.charCodeAt(0) || 1) * 0.7854
+				dx = Math.cos(angle)
+				dz = Math.sin(angle)
+				dist = 0.01
+			}
+
+			if (dist < separationRadius) {
+				pushX += (dx / dist) * (separationRadius - dist)
+				pushZ += (dz / dist) * (separationRadius - dist)
+				neighbors++
+			}
+		}
+
+		if (neighbors > 0) {
+			transform.position.x += (pushX / neighbors) * separationForce
+			transform.position.z += (pushZ / neighbors) * separationForce
 		}
 	}
 
