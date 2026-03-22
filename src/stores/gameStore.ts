@@ -134,18 +134,18 @@ export const useGameStore = create<GameStore>()(
 			systemManager.registerSystem(new CombatSystem())
 			systemManager.registerSystem(new ProductionSystem())
 			const resourceSystem = new ResourceSystem()
-			resourceSystem.setDepositCallback((playerId, amount) => {
+			resourceSystem.setDepositCallback((playerId, amount, resourceType) => {
 				const state = useGameStore.getState()
 				const player = state.players.get(playerId)
 				if (player) {
 					const players = new Map(state.players)
-					players.set(playerId, {
-						...player,
-						resources: {
-							...player.resources,
-							minerals: player.resources.minerals + amount,
-						},
-					})
+					const resources = { ...player.resources }
+					if (resourceType === 'gas') {
+						resources.gas += amount
+					} else {
+						resources.minerals += amount
+					}
+					players.set(playerId, { ...player, resources })
 					useGameStore.setState({ players })
 				}
 			})

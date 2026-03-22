@@ -14,7 +14,7 @@ import type { ComponentManager } from '../ComponentManager'
 import { componentManager as defaultComponentManager } from '../ComponentManager'
 import { System } from '../SystemManager'
 
-export type DepositCallback = (playerId: string, amount: number) => void
+export type DepositCallback = (playerId: string, amount: number, resourceType: 'mineral' | 'gas') => void
 
 export class ResourceSystem extends System {
 	readonly requiredComponents = [
@@ -58,8 +58,12 @@ export class ResourceSystem extends System {
 	private processReturning(entity: Entity, carrier: ResourceCarrierComponent): void {
 		if (carrier.currentLoad > 0 && this.onDeposit) {
 			const owner = entity.components.get(ComponentType.OWNER) as OwnerComponent
-			if (owner) {
-				this.onDeposit(owner.playerId, carrier.currentLoad)
+			if (owner && carrier.targetResourceId) {
+				const resource = this.componentManager.getComponent<ResourceComponent>(
+					carrier.targetResourceId, ComponentType.RESOURCE
+				)
+				const resourceType = resource?.resourceType ?? 'mineral'
+				this.onDeposit(owner.playerId, carrier.currentLoad, resourceType)
 			}
 		}
 		carrier.currentLoad = 0
@@ -83,7 +87,9 @@ export class ResourceSystem extends System {
 		}
 
 		carrier.gatherTimer += deltaTime
-		const interval = GAME_CONFIG.mineralPatch.gatherInterval
+		const interval = resource.resourceType === 'gas'
+			? GAME_CONFIG.gasGeyser.gatherInterval
+			: GAME_CONFIG.mineralPatch.gatherInterval
 
 		if (carrier.gatherTimer >= interval) {
 			carrier.gatherTimer -= interval
