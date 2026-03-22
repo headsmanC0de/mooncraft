@@ -138,6 +138,29 @@ export class EntityFactory {
 		return id
 	}
 
+	createGasGeyser(position: Vector3, amount?: number): EntityId {
+		const id = this.entities.createEntity()
+
+		this.components.addComponent(id, {
+			type: ComponentType.TRANSFORM,
+			position: { ...position },
+			rotation: 0,
+			scale: { x: 1.5, y: 1, z: 1.5 },
+		})
+		this.components.addComponent(id, {
+			type: ComponentType.RESOURCE,
+			resourceType: 'gas',
+			amount: amount ?? 2500,
+			maxCapacity: amount ?? 2500,
+		})
+		this.components.addComponent(id, {
+			type: ComponentType.RENDER,
+			color: '#44cc44',
+			visible: true,
+		})
+		return id
+	}
+
 	createMineralPatch(position: Vector3, amount?: number): EntityId {
 		const id = this.entities.createEntity()
 

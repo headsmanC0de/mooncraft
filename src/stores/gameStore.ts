@@ -68,6 +68,12 @@ function spawnStartingBase(
 	}
 }
 
+function spawnGasGeysers(factory: EntityFactory) {
+	// One gas geyser near each base
+	factory.createGasGeyser({ x: 25, y: 0, z: 12 })
+	factory.createGasGeyser({ x: 113, y: 0, z: 100 })
+}
+
 interface GameStore extends GameState {
 	// Selection
 	selectedUnits: EntityId[]
@@ -196,6 +202,9 @@ export const useGameStore = create<GameStore>()(
 				{ x: 118, y: 0, z: 105 },
 				{ x: 120, y: 0, z: 105 },
 			])
+
+			// Spawn gas geysers near each base
+			spawnGasGeysers(factory)
 
 			set({ players, isPaused: false })
 			systemManager.start()
