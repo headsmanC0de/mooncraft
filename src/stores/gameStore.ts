@@ -70,6 +70,9 @@ interface GameStore extends GameState {
 	// Game status
 	gameStatus: GameStatus
 
+	// Player faction selection
+	playerFaction: 'terran' | 'protoss'
+
 	// Actions
 	initializeGame: () => void
 	selectUnits: (ids: EntityId[], additive?: boolean) => void
@@ -101,6 +104,7 @@ export const useGameStore = create<GameStore>()(
 		hoveredEntity: null,
 		showPauseMenu: false,
 		gameStatus: 'playing' as GameStatus,
+		playerFaction: 'terran' as 'terran' | 'protoss',
 
 		initializeGame: () => {
 			// Register systems
@@ -129,13 +133,17 @@ export const useGameStore = create<GameStore>()(
 			systemManager.registerSystem(new AISystem())
 			systemManager.registerSystem(new VisionSystem())
 
+			// Determine factions based on player selection
+			const playerFaction = get().playerFaction
+			const aiFaction: 'terran' | 'protoss' = playerFaction === 'terran' ? 'protoss' : 'terran'
+
 			// Initialize players
 			const players = new Map<string, PlayerState>()
 			players.set('player1', {
 				id: 'player1',
 				name: 'Player 1',
 				teamId: 'team1',
-				faction: 'terran',
+				faction: playerFaction,
 				resources: { minerals: 500, gas: 250, supply: 10, maxSupply: 50 },
 				isAlive: true,
 			})
@@ -143,7 +151,7 @@ export const useGameStore = create<GameStore>()(
 				id: 'player2',
 				name: 'Player 2',
 				teamId: 'team2',
-				faction: 'protoss',
+				faction: aiFaction,
 				resources: { minerals: 500, gas: 250, supply: 10, maxSupply: 50 },
 				isAlive: true,
 			})
@@ -151,8 +159,8 @@ export const useGameStore = create<GameStore>()(
 			// Spawn starting entities
 			const factory = new EntityFactory(entityManager, componentManager)
 
-			// Player 1 starting base (terran, around x=20, z=20)
-			spawnStartingBase(factory, 'player1', 'team1', 'terran', { x: 20, y: 0, z: 20 }, [
+			// Player 1 starting base (around x=20, z=20)
+			spawnStartingBase(factory, 'player1', 'team1', playerFaction, { x: 20, y: 0, z: 20 }, [
 				{ x: 8, y: 0, z: 15 },
 				{ x: 10, y: 0, z: 15 },
 				{ x: 12, y: 0, z: 15 },
@@ -163,8 +171,8 @@ export const useGameStore = create<GameStore>()(
 				{ x: 14, y: 0, z: 17 },
 			])
 
-			// Player 2 (AI) starting base (protoss, around x=108, z=108)
-			spawnStartingBase(factory, 'player2', 'team2', 'protoss', { x: 108, y: 0, z: 108 }, [
+			// Player 2 (AI) starting base (around x=108, z=108)
+			spawnStartingBase(factory, 'player2', 'team2', aiFaction, { x: 108, y: 0, z: 108 }, [
 				{ x: 114, y: 0, z: 103 },
 				{ x: 116, y: 0, z: 103 },
 				{ x: 118, y: 0, z: 103 },
