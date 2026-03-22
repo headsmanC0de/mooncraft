@@ -112,7 +112,7 @@ export function BuildingMesh({
 							</mesh>
 							{/* Shield fill */}
 							<mesh position={[((health.shields ?? 0) / health.maxShields - 1) * 0.6, 0, 0.01]}>
-								<planeGeometry args={[1.2 * (health.shields ?? 0) / health.maxShields, 0.06]} />
+								<planeGeometry args={[(1.2 * (health.shields ?? 0)) / health.maxShields, 0.06]} />
 								<meshBasicMaterial color="#4488ff" />
 							</mesh>
 						</group>

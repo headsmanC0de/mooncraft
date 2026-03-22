@@ -12,13 +12,13 @@ import {
 	AISystem,
 	BuildingSystem,
 	CombatSystem,
-	ShieldSystem,
 	componentManager,
 	EntityFactory,
 	entityManager,
 	MovementSystem,
 	ProductionSystem,
 	ResourceSystem,
+	ShieldSystem,
 	systemManager,
 	VisionSystem,
 } from '@/lib/ecs'
@@ -41,11 +41,24 @@ function spawnStartingBase(
 	factory.createBuilding(mainBuilding, playerId, teamId, basePosition, true, faction)
 
 	// Create 4 workers around base
-	const offsets = [{ x: -2, z: 2 }, { x: 2, z: 2 }, { x: -2, z: -2 }, { x: 2, z: -2 }]
+	const offsets = [
+		{ x: -2, z: 2 },
+		{ x: 2, z: 2 },
+		{ x: -2, z: -2 },
+		{ x: 2, z: -2 },
+	]
 	for (const offset of offsets) {
-		factory.createUnit(workerType, playerId, teamId, {
-			x: basePosition.x + offset.x, y: 0, z: basePosition.z + offset.z,
-		}, faction)
+		factory.createUnit(
+			workerType,
+			playerId,
+			teamId,
+			{
+				x: basePosition.x + offset.x,
+				y: 0,
+				z: basePosition.z + offset.z,
+			},
+			faction,
+		)
 	}
 
 	// Create mineral patches

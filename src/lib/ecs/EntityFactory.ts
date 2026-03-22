@@ -17,7 +17,13 @@ export class EntityFactory {
 		private components: ComponentManager,
 	) {}
 
-	createUnit(unitType: string, playerId: string, teamId: string, position: Vector3, faction?: 'terran' | 'protoss'): EntityId {
+	createUnit(
+		unitType: string,
+		playerId: string,
+		teamId: string,
+		position: Vector3,
+		faction?: 'terran' | 'protoss',
+	): EntityId {
 		const def = getUnitDef(unitType)
 		const resolvedFaction = faction ?? def.faction
 		const id = this.entities.createEntity()

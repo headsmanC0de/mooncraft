@@ -34,7 +34,13 @@ export class ProductionSystem extends System {
 
 			if (item.progress >= item.duration) {
 				// Spawn unit at rally point
-				this.factory.createUnit(item.type, owner.playerId, owner.teamId, building.rallyPoint, owner.faction)
+				this.factory.createUnit(
+					item.type,
+					owner.playerId,
+					owner.teamId,
+					building.rallyPoint,
+					owner.faction,
+				)
 				building.queue.shift()
 			}
 		}

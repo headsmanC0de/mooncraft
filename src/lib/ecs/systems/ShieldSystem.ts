@@ -20,10 +20,7 @@ export class ShieldSystem extends System {
 			const currentShields = health.shields ?? 0
 			if (currentShields >= health.maxShields) continue
 
-			health.shields = Math.min(
-				health.maxShields,
-				currentShields + SHIELD_REGEN_RATE * deltaTime,
-			)
+			health.shields = Math.min(health.maxShields, currentShields + SHIELD_REGEN_RATE * deltaTime)
 		}
 	}
 }

@@ -6,7 +6,10 @@ import { GAME_CONFIG } from '@/config'
 
 type Faction = 'terran' | 'protoss'
 
-const factionInfo: Record<Faction, { name: string; description: string; color: string; borderColor: string; icon: string }> = {
+const factionInfo: Record<
+	Faction,
+	{ name: string; description: string; color: string; borderColor: string; icon: string }
+> = {
 	terran: {
 		name: 'Terran',
 		description: 'Versatile and mobile',
@@ -148,9 +151,7 @@ export default function Home() {
 										gap: '6px',
 										padding: '20px 28px',
 										background: isSelected ? info.color : 'rgba(255,255,255,0.03)',
-										border: isSelected
-											? '2px solid #00ff88'
-											: `1px solid ${info.borderColor}`,
+										border: isSelected ? '2px solid #00ff88' : `1px solid ${info.borderColor}`,
 										borderRadius: '10px',
 										cursor: 'pointer',
 										transition: 'all 0.15s ease',
