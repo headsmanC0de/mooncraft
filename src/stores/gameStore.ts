@@ -15,6 +15,7 @@ import {
 	MovementSystem,
 	ProductionSystem,
 	ResourceSystem,
+	VisionSystem,
 	systemManager,
 } from '@/lib/ecs'
 import { getBuildingDef } from '@/config/buildings'
@@ -99,6 +100,7 @@ export const useGameStore = create<GameStore>()(
 			})
 			systemManager.registerSystem(resourceSystem)
 			systemManager.registerSystem(new AISystem())
+			systemManager.registerSystem(new VisionSystem())
 
 			// Initialize players
 			const players = new Map<string, PlayerState>()

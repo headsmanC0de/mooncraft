@@ -91,7 +91,7 @@ export function EntityRenderer() {
 
 	return (
 		<>
-			{entities.map((e) => {
+			{entities.filter((e) => !e.render || e.render.visible).map((e) => {
 				switch (e.entityType) {
 					case 'resource':
 						return (

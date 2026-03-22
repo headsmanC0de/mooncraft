@@ -60,6 +60,18 @@ export function BuildingMesh({
 				/>
 			</mesh>
 
+			{/* Roof pyramid (shown when complete) */}
+			{!isBuilding && (
+				<mesh castShadow position={[0, transform.scale.y + 0.25, 0]}>
+					<coneGeometry args={[Math.min(scaleX, scaleZ) * 0.6, 0.5, 4]} />
+					<meshStandardMaterial
+						color={render.color ?? '#888888'}
+						metalness={0.3}
+						roughness={0.7}
+					/>
+				</mesh>
+			)}
+
 			{/* Selection ring */}
 			{selection.isSelected && (
 				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
@@ -84,7 +96,7 @@ export function BuildingMesh({
 
 			{/* Health bar (shown when complete) */}
 			{!isBuilding && (
-				<group ref={healthBarRef} position={[0, transform.scale.y + 0.5, 0]}>
+				<group ref={healthBarRef} position={[0, transform.scale.y + 0.8, 0]}>
 					<mesh position={[0, 0, -0.001]}>
 						<planeGeometry args={[1.2, 0.1]} />
 						<meshBasicMaterial color="#333333" transparent opacity={0.6} />
