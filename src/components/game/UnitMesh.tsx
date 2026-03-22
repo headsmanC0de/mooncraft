@@ -26,22 +26,22 @@ function getHealthColor(percent: number): string {
 function getUnitGeometry(scale: number) {
 	if (scale <= 0.85) {
 		// Worker — small sphere
-		return <sphereGeometry args={[0.3, 8, 6]} />
+		return <sphereGeometry args={[0.6, 8, 6]} />
 	} else if (scale >= 1.45) {
 		// Colossus — tall thin box with legs
-		return <boxGeometry args={[0.3, 1.0, 0.3]} />
+		return <boxGeometry args={[0.6, 2.0, 0.6]} />
 	} else if (scale >= 1.35) {
 		// Flying/heavy — flat disc
-		return <cylinderGeometry args={[0.5, 0.4, 0.3, 8]} />
+		return <cylinderGeometry args={[0.8, 0.65, 0.5, 8]} />
 	} else if (scale >= 1.15) {
 		// Vehicle — box
-		return <boxGeometry args={[0.6, 0.4, 0.8]} />
+		return <boxGeometry args={[1.0, 0.6, 1.2]} />
 	} else if (scale >= 1.05) {
 		// Stalker — tall capsule
-		return <capsuleGeometry args={[0.2, 0.7, 4, 8]} />
+		return <capsuleGeometry args={[0.4, 1.0, 4, 8]} />
 	} else {
 		// Standard infantry — capsule (marine/zealot)
-		return <capsuleGeometry args={[0.25, 0.5, 4, 8]} />
+		return <capsuleGeometry args={[0.5, 0.8, 4, 8]} />
 	}
 }
 
@@ -63,12 +63,12 @@ export function UnitMesh({ transform, health, selection, render }: UnitMeshProps
 
 	return (
 		<group
-			position={[transform.position.x, transform.position.y + 0.5, transform.position.z]}
+			position={[transform.position.x, transform.position.y + 0.8, transform.position.z]}
 			rotation={[0, transform.rotation, 0]}
 		>
 			{/* Shadow disc */}
-			<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.48, 0]}>
-				<circleGeometry args={[0.5 * modelScale, 16]} />
+			<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.78, 0]}>
+				<circleGeometry args={[0.8 * modelScale, 16]} />
 				<meshBasicMaterial color="#000000" transparent opacity={0.3} />
 			</mesh>
 
@@ -85,43 +85,43 @@ export function UnitMesh({ transform, health, selection, render }: UnitMeshProps
 					position={[0, 0, 0.4 * modelScale]}
 					scale={[modelScale, modelScale, modelScale]}
 				>
-					<boxGeometry args={[0.08, 0.08, 0.25]} />
+					<boxGeometry args={[0.15, 0.15, 0.5]} />
 					<meshStandardMaterial color={render.color ?? '#4488ff'} />
 				</mesh>
 			)}
 
 			{/* Selection ring */}
 			{selection.isSelected && (
-				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
-					<ringGeometry args={[0.5 * modelScale, 0.6 * modelScale, 32]} />
+				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.78, 0]}>
+					<ringGeometry args={[0.8 * modelScale, 0.95 * modelScale, 32]} />
 					<meshBasicMaterial color="#00ff88" transparent opacity={0.8} />
 				</mesh>
 			)}
 
 			{/* Health bar (billboard) */}
-			<group ref={healthBarRef} position={[0, 1.0 * modelScale, 0]}>
+			<group ref={healthBarRef} position={[0, 2.0 * modelScale, 0]}>
 				{/* Background */}
 				<mesh position={[0, 0, -0.001]}>
-					<planeGeometry args={[1.0, 0.1]} />
+					<planeGeometry args={[1.6, 0.15]} />
 					<meshBasicMaterial color="#333333" transparent opacity={0.6} />
 				</mesh>
 				{/* Fill */}
-				<mesh position={[(healthPercent - 1) * 0.5, 0, 0]}>
-					<planeGeometry args={[1.0 * healthPercent, 0.1]} />
+				<mesh position={[(healthPercent - 1) * 0.8, 0, 0]}>
+					<planeGeometry args={[1.6 * healthPercent, 0.15]} />
 					<meshBasicMaterial color={getHealthColor(healthPercent)} />
 				</mesh>
 
 				{/* Shield bar - only for units with shields */}
 				{health.maxShields != null && health.maxShields > 0 && (
-					<group position={[0, 0.15, 0]}>
+					<group position={[0, 0.2, 0]}>
 						{/* Background */}
 						<mesh>
-							<planeGeometry args={[1, 0.08]} />
+							<planeGeometry args={[1.6, 0.12]} />
 							<meshBasicMaterial color="#222244" />
 						</mesh>
 						{/* Shield fill */}
-						<mesh position={[((health.shields ?? 0) / health.maxShields - 1) * 0.5, 0, 0.01]}>
-							<planeGeometry args={[(health.shields ?? 0) / health.maxShields, 0.06]} />
+						<mesh position={[((health.shields ?? 0) / health.maxShields - 1) * 0.8, 0, 0.01]}>
+							<planeGeometry args={[1.6 * (health.shields ?? 0) / health.maxShields, 0.1]} />
 							<meshBasicMaterial color="#4488ff" />
 						</mesh>
 					</group>

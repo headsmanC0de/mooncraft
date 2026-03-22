@@ -190,6 +190,7 @@ export interface InputMessage {
 // Game state
 export interface GameState {
 	currentTick: number
+	elapsedTime: number
 	entities: Map<EntityId, Entity>
 	players: Map<string, PlayerState>
 	isPaused: boolean
