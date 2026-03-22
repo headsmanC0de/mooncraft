@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { SystemManager, System } from '../SystemManager'
-import { ComponentType } from '@/types/ecs'
 import type { Entity } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
+import { System, SystemManager } from '../SystemManager'
 
 vi.mock('../EntityManager', () => ({
 	entityManager: {
@@ -131,9 +131,7 @@ describe('SystemManager', () => {
 			sm.registerSystem(systemA)
 			sm.start()
 			sm.update(16)
-			expect(entityManager.queryEntities).toHaveBeenCalledWith(
-				ComponentType.TRANSFORM,
-			)
+			expect(entityManager.queryEntities).toHaveBeenCalledWith(ComponentType.TRANSFORM)
 		})
 
 		it('should pass queried entities to the system', () => {

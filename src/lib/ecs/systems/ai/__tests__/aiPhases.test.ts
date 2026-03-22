@@ -4,6 +4,9 @@ import { ComponentType } from '@/types/ecs'
 import { ComponentManager } from '../../../ComponentManager'
 import { EntityFactory } from '../../../EntityFactory'
 import { EntityManager } from '../../../EntityManager'
+import { executeAttackPhase } from '../AIAttackPhase'
+import { executeBuildPhase } from '../AIBuildPhase'
+import { executeExpandPhase } from '../AIExpandPhase'
 import {
 	countByType,
 	countWorkers,
@@ -13,9 +16,6 @@ import {
 	getPlayer2Resources,
 	trainFromBuilding,
 } from '../aiHelpers'
-import { executeBuildPhase } from '../AIBuildPhase'
-import { executeExpandPhase } from '../AIExpandPhase'
-import { executeAttackPhase } from '../AIAttackPhase'
 
 // Mock the game store
 const mockState: { players: Map<string, unknown> } = { players: new Map() }
@@ -175,7 +175,11 @@ describe('aiHelpers', () => {
 	describe('trainFromBuilding', () => {
 		it('should add a unit to the building queue', () => {
 			const ccId = factory.createBuilding(
-				'command_center', 'player2', 'team2', { x: 10, y: 0, z: 10 }, true,
+				'command_center',
+				'player2',
+				'team2',
+				{ x: 10, y: 0, z: 10 },
+				true,
 			)
 			const entity = em.getEntity(ccId)!
 			trainFromBuilding(entity, 'worker')
@@ -189,7 +193,11 @@ describe('aiHelpers', () => {
 
 		it('should not queue when building is incomplete', () => {
 			const ccId = factory.createBuilding(
-				'command_center', 'player2', 'team2', { x: 10, y: 0, z: 10 }, false,
+				'command_center',
+				'player2',
+				'team2',
+				{ x: 10, y: 0, z: 10 },
+				false,
 			)
 			const entity = em.getEntity(ccId)!
 			trainFromBuilding(entity, 'worker')
@@ -200,7 +208,11 @@ describe('aiHelpers', () => {
 
 		it('should not queue more than 2 units', () => {
 			const ccId = factory.createBuilding(
-				'command_center', 'player2', 'team2', { x: 10, y: 0, z: 10 }, true,
+				'command_center',
+				'player2',
+				'team2',
+				{ x: 10, y: 0, z: 10 },
+				true,
 			)
 			const entity = em.getEntity(ccId)!
 			trainFromBuilding(entity, 'worker')
@@ -214,7 +226,11 @@ describe('aiHelpers', () => {
 		it('should not queue when resources are insufficient', () => {
 			resetPlayers(0, 0)
 			const ccId = factory.createBuilding(
-				'command_center', 'player2', 'team2', { x: 10, y: 0, z: 10 }, true,
+				'command_center',
+				'player2',
+				'team2',
+				{ x: 10, y: 0, z: 10 },
+				true,
 			)
 			const entity = em.getEntity(ccId)!
 			trainFromBuilding(entity, 'worker')
@@ -239,7 +255,11 @@ describe('AIBuildPhase', () => {
 
 	it('should queue worker training when worker count is low', () => {
 		const ccId = factory.createBuilding(
-			'command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true,
+			'command_center',
+			'player2',
+			'team2',
+			{ x: 108, y: 0, z: 108 },
+			true,
 		)
 		// Add supply depot so supply.max > supply.used
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 105, y: 0, z: 108 }, true)
@@ -254,7 +274,11 @@ describe('AIBuildPhase', () => {
 
 	it('should not queue workers when already at 8', () => {
 		const ccId = factory.createBuilding(
-			'command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true,
+			'command_center',
+			'player2',
+			'team2',
+			{ x: 108, y: 0, z: 108 },
+			true,
 		)
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 105, y: 0, z: 108 }, true)
 		// Create 8 workers
@@ -273,7 +297,7 @@ describe('AIBuildPhase', () => {
 	it('should build supply depot when none exists', () => {
 		factory.createBuilding('command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true)
 
-		const entitiesBefore = em.getEntityCount()
+		const _entitiesBefore = em.getEntityCount()
 		const entities = em.getAllEntities()
 		executeBuildPhase(entities, factory, em, 'terran')
 
@@ -301,8 +325,13 @@ describe('AIBuildPhase', () => {
 	})
 
 	it('should work with protoss faction', () => {
-		const nexusId = factory.createBuilding(
-			'nexus', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true, 'protoss',
+		const _nexusId = factory.createBuilding(
+			'nexus',
+			'player2',
+			'team2',
+			{ x: 108, y: 0, z: 108 },
+			true,
+			'protoss',
 		)
 
 		const entities = em.getAllEntities()
@@ -338,7 +367,11 @@ describe('AIExpandPhase', () => {
 		factory.createBuilding('command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true)
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 105, y: 0, z: 108 }, true)
 		const barracksId = factory.createBuilding(
-			'barracks', 'player2', 'team2', { x: 102, y: 0, z: 108 }, true,
+			'barracks',
+			'player2',
+			'team2',
+			{ x: 102, y: 0, z: 108 },
+			true,
 		)
 
 		const entities = em.getAllEntities()
@@ -351,7 +384,11 @@ describe('AIExpandPhase', () => {
 
 	it('should train workers up to 12', () => {
 		const ccId = factory.createBuilding(
-			'command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true,
+			'command_center',
+			'player2',
+			'team2',
+			{ x: 108, y: 0, z: 108 },
+			true,
 		)
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 105, y: 0, z: 108 }, true)
 
@@ -365,7 +402,11 @@ describe('AIExpandPhase', () => {
 
 	it('should not train workers when already at 12', () => {
 		const ccId = factory.createBuilding(
-			'command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true,
+			'command_center',
+			'player2',
+			'team2',
+			{ x: 108, y: 0, z: 108 },
+			true,
 		)
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 105, y: 0, z: 108 }, true)
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 103, y: 0, z: 108 }, true)
@@ -467,8 +508,12 @@ describe('AIAttackPhase', () => {
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 105, y: 0, z: 108 }, true)
 
 		// Create player1 entities at different distances
-		const farId = factory.createBuilding(
-			'command_center', 'player1', 'team1', { x: 20, y: 0, z: 20 }, true,
+		const _farId = factory.createBuilding(
+			'command_center',
+			'player1',
+			'team1',
+			{ x: 20, y: 0, z: 20 },
+			true,
 		)
 		const nearId = factory.createUnit('marine', 'player1', 'team1', { x: 80, y: 0, z: 80 })
 
@@ -488,7 +533,11 @@ describe('AIAttackPhase', () => {
 		factory.createBuilding('command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true)
 		factory.createBuilding('supply_depot', 'player2', 'team2', { x: 105, y: 0, z: 108 }, true)
 		const barracksId = factory.createBuilding(
-			'barracks', 'player2', 'team2', { x: 102, y: 0, z: 108 }, true,
+			'barracks',
+			'player2',
+			'team2',
+			{ x: 102, y: 0, z: 108 },
+			true,
 		)
 
 		const aiEntities = em.getAllEntities().filter((e) => {

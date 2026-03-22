@@ -1,20 +1,30 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { EntityManager } from '@/lib/ecs/EntityManager'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ComponentManager } from '@/lib/ecs/ComponentManager'
 import { EntityFactory } from '@/lib/ecs/EntityFactory'
-import { MovementSystem } from '@/lib/ecs/systems/MovementSystem'
+import { EntityManager } from '@/lib/ecs/EntityManager'
+import { BuildingSystem } from '@/lib/ecs/systems/BuildingSystem'
 import { CombatSystem } from '@/lib/ecs/systems/CombatSystem'
 import { DeathSystem } from '@/lib/ecs/systems/DeathSystem'
-import { BuildingSystem } from '@/lib/ecs/systems/BuildingSystem'
+import { MovementSystem } from '@/lib/ecs/systems/MovementSystem'
+import { ProductionSystem } from '@/lib/ecs/systems/ProductionSystem'
 import { ResourceSystem } from '@/lib/ecs/systems/ResourceSystem'
 import { ShieldSystem } from '@/lib/ecs/systems/ShieldSystem'
-import { ProductionSystem } from '@/lib/ecs/systems/ProductionSystem'
+import type { BuildingComponent, CombatComponent, HealthComponent } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
-import type { HealthComponent, CombatComponent, BuildingComponent } from '@/types/ecs'
 
 // Mock audio
 vi.mock('@/lib/audio', () => ({
-	audioEngine: { playAttack: vi.fn(), playClick: vi.fn(), playSelect: vi.fn(), playMove: vi.fn(), playBuild: vi.fn(), playComplete: vi.fn(), playTrain: vi.fn(), playGather: vi.fn(), playError: vi.fn() },
+	audioEngine: {
+		playAttack: vi.fn(),
+		playClick: vi.fn(),
+		playSelect: vi.fn(),
+		playMove: vi.fn(),
+		playBuild: vi.fn(),
+		playComplete: vi.fn(),
+		playTrain: vi.fn(),
+		playGather: vi.fn(),
+		playError: vi.fn(),
+	},
 }))
 
 describe('Integration: Combat Scenario', () => {
@@ -38,7 +48,8 @@ describe('Integration: Combat Scenario', () => {
 		const deathSystem = new DeathSystem(em)
 
 		// Attack many times until target dies
-		const entities = () => em.queryEntities(ComponentType.TRANSFORM, ComponentType.COMBAT, ComponentType.HEALTH)
+		const entities = () =>
+			em.queryEntities(ComponentType.TRANSFORM, ComponentType.COMBAT, ComponentType.HEALTH)
 		for (let i = 0; i < 100; i++) {
 			combatSystem.update(entities(), 1)
 		}
@@ -73,7 +84,11 @@ describe('Integration: Combat Scenario', () => {
 		}
 
 		// Should be close enough to attack
-		const combatEntities = em.queryEntities(ComponentType.TRANSFORM, ComponentType.COMBAT, ComponentType.HEALTH)
+		const combatEntities = em.queryEntities(
+			ComponentType.TRANSFORM,
+			ComponentType.COMBAT,
+			ComponentType.HEALTH,
+		)
 		combatSystem.update(combatEntities, 1)
 
 		const targetHealth = cm.getComponent<HealthComponent>(target, ComponentType.HEALTH)

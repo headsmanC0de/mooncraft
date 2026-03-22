@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { componentManager, EntityFactory, entityManager } from '@/lib/ecs'
-import { ComponentType } from '@/types/ecs'
 import type { BuildingComponent, MovementComponent, SelectionComponent } from '@/types/ecs'
+import { ComponentType } from '@/types/ecs'
 
 vi.mock('@/lib/audio', () => ({
 	audioEngine: {
@@ -40,10 +40,7 @@ describe('GameStore', () => {
 			useGameStore.getState().selectUnits([id])
 
 			expect(useGameStore.getState().selectedUnits).toContain(id)
-			const sel = componentManager.getComponent<SelectionComponent>(
-				id,
-				ComponentType.SELECTION,
-			)
+			const sel = componentManager.getComponent<SelectionComponent>(id, ComponentType.SELECTION)
 			expect(sel?.isSelected).toBe(true)
 		})
 
@@ -64,10 +61,7 @@ describe('GameStore', () => {
 			useGameStore.getState().selectUnits([id1])
 			useGameStore.getState().selectUnits([id2])
 
-			const sel1 = componentManager.getComponent<SelectionComponent>(
-				id1,
-				ComponentType.SELECTION,
-			)
+			const sel1 = componentManager.getComponent<SelectionComponent>(id1, ComponentType.SELECTION)
 			expect(sel1?.isSelected).toBe(false)
 		})
 
@@ -107,10 +101,7 @@ describe('GameStore', () => {
 			useGameStore.getState().selectUnits([id])
 			useGameStore.getState().clearSelection()
 
-			const sel = componentManager.getComponent<SelectionComponent>(
-				id,
-				ComponentType.SELECTION,
-			)
+			const sel = componentManager.getComponent<SelectionComponent>(id, ComponentType.SELECTION)
 			expect(sel?.isSelected).toBe(false)
 		})
 	})
@@ -121,10 +112,7 @@ describe('GameStore', () => {
 			useGameStore.getState().selectUnits([id])
 			useGameStore.getState().moveSelectedUnits({ x: 10, y: 0, z: 10 })
 
-			const movement = componentManager.getComponent<MovementComponent>(
-				id,
-				ComponentType.MOVEMENT,
-			)
+			const movement = componentManager.getComponent<MovementComponent>(id, ComponentType.MOVEMENT)
 			expect(movement?.targetPosition).toBeDefined()
 			expect(movement?.targetPosition?.x).toBeCloseTo(10, 0)
 			expect(movement?.targetPosition?.z).toBeCloseTo(10, 0)
@@ -153,10 +141,7 @@ describe('GameStore', () => {
 			useGameStore.getState().selectUnits([id])
 			useGameStore.getState().moveSelectedUnits({ x: 20, y: 0, z: 30 })
 
-			const movement = componentManager.getComponent<MovementComponent>(
-				id,
-				ComponentType.MOVEMENT,
-			)
+			const movement = componentManager.getComponent<MovementComponent>(id, ComponentType.MOVEMENT)
 			expect(movement?.targetPosition?.x).toBe(20)
 			expect(movement?.targetPosition?.z).toBe(30)
 		})
@@ -172,10 +157,7 @@ describe('GameStore', () => {
 			useGameStore.getState().selectUnits([id])
 			useGameStore.getState().stopSelectedUnits()
 
-			const movement = componentManager.getComponent<MovementComponent>(
-				id,
-				ComponentType.MOVEMENT,
-			)
+			const movement = componentManager.getComponent<MovementComponent>(id, ComponentType.MOVEMENT)
 			expect(movement?.targetPosition).toBeNull()
 			expect(movement?.isMoving).toBe(false)
 		})
@@ -371,12 +353,11 @@ describe('GameStore', () => {
 		})
 
 		it('should not train from incomplete building', () => {
-			const incompleteId = factory.createBuilding(
-				'barracks',
-				'player1',
-				'team1',
-				{ x: 20, y: 0, z: 20 },
-			)
+			const incompleteId = factory.createBuilding('barracks', 'player1', 'team1', {
+				x: 20,
+				y: 0,
+				z: 20,
+			})
 
 			useGameStore.getState().trainUnit(incompleteId, 'marine')
 
