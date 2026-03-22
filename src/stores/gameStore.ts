@@ -12,6 +12,7 @@ import {
 	AISystem,
 	BuildingSystem,
 	CombatSystem,
+	ShieldSystem,
 	componentManager,
 	EntityFactory,
 	entityManager,
@@ -105,6 +106,7 @@ export const useGameStore = create<GameStore>()(
 			// Register systems
 			systemManager.registerSystem(new MovementSystem())
 			systemManager.registerSystem(new BuildingSystem())
+			systemManager.registerSystem(new ShieldSystem())
 			systemManager.registerSystem(new CombatSystem())
 			systemManager.registerSystem(new ProductionSystem())
 			const resourceSystem = new ResourceSystem()

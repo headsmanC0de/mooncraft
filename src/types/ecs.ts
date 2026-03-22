@@ -47,6 +47,7 @@ export interface HealthComponent {
 	max: number
 	armor: number
 	shields?: number
+	maxShields?: number
 }
 
 export interface MovementComponent {

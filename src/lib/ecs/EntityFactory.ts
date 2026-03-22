@@ -34,6 +34,7 @@ export class EntityFactory {
 			max: def.stats.health,
 			armor: def.stats.armor,
 			shields: def.stats.shields,
+			maxShields: def.stats.shields,
 		})
 		this.components.addComponent(id, {
 			type: ComponentType.MOVEMENT,
