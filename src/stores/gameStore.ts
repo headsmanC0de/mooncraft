@@ -26,6 +26,33 @@ import { calculateSupplyFromEntities } from '@/lib/game/supply'
 import type { BuildingComponent, EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
+function spawnStartingBase(
+	factory: EntityFactory,
+	playerId: string,
+	teamId: string,
+	faction: 'terran' | 'protoss',
+	basePosition: Vector3,
+	mineralPositions: Vector3[],
+) {
+	const mainBuilding = faction === 'terran' ? 'command_center' : 'nexus'
+	const workerType = faction === 'terran' ? 'worker' : 'probe'
+
+	factory.createBuilding(mainBuilding, playerId, teamId, basePosition, true, faction)
+
+	// Create 4 workers around base
+	const offsets = [{ x: -2, z: 2 }, { x: 2, z: 2 }, { x: -2, z: -2 }, { x: 2, z: -2 }]
+	for (const offset of offsets) {
+		factory.createUnit(workerType, playerId, teamId, {
+			x: basePosition.x + offset.x, y: 0, z: basePosition.z + offset.z,
+		}, faction)
+	}
+
+	// Create mineral patches
+	for (const pos of mineralPositions) {
+		factory.createMineralPatch(pos)
+	}
+}
+
 interface GameStore extends GameState {
 	// Selection
 	selectedUnits: EntityId[]
@@ -106,6 +133,7 @@ export const useGameStore = create<GameStore>()(
 				id: 'player1',
 				name: 'Player 1',
 				teamId: 'team1',
+				faction: 'terran',
 				resources: { minerals: 500, gas: 250, supply: 10, maxSupply: 50 },
 				isAlive: true,
 			})
@@ -113,6 +141,7 @@ export const useGameStore = create<GameStore>()(
 				id: 'player2',
 				name: 'Player 2',
 				teamId: 'team2',
+				faction: 'protoss',
 				resources: { minerals: 500, gas: 250, supply: 10, maxSupply: 50 },
 				isAlive: true,
 			})
@@ -120,39 +149,29 @@ export const useGameStore = create<GameStore>()(
 			// Spawn starting entities
 			const factory = new EntityFactory(entityManager, componentManager)
 
-			// Player 1 starting entities (around x=20, z=20)
-			factory.createBuilding('command_center', 'player1', 'team1', { x: 20, y: 0, z: 20 }, true)
-			factory.createUnit('worker', 'player1', 'team1', { x: 18, y: 0, z: 22 })
-			factory.createUnit('worker', 'player1', 'team1', { x: 22, y: 0, z: 22 })
-			factory.createUnit('worker', 'player1', 'team1', { x: 18, y: 0, z: 18 })
-			factory.createUnit('worker', 'player1', 'team1', { x: 22, y: 0, z: 18 })
+			// Player 1 starting base (terran, around x=20, z=20)
+			spawnStartingBase(factory, 'player1', 'team1', 'terran', { x: 20, y: 0, z: 20 }, [
+				{ x: 8, y: 0, z: 15 },
+				{ x: 10, y: 0, z: 15 },
+				{ x: 12, y: 0, z: 15 },
+				{ x: 14, y: 0, z: 15 },
+				{ x: 8, y: 0, z: 17 },
+				{ x: 10, y: 0, z: 17 },
+				{ x: 12, y: 0, z: 17 },
+				{ x: 14, y: 0, z: 17 },
+			])
 
-			// Player 1 mineral patches (around x=8-14, z=15-25)
-			factory.createMineralPatch({ x: 8, y: 0, z: 15 })
-			factory.createMineralPatch({ x: 10, y: 0, z: 15 })
-			factory.createMineralPatch({ x: 12, y: 0, z: 15 })
-			factory.createMineralPatch({ x: 14, y: 0, z: 15 })
-			factory.createMineralPatch({ x: 8, y: 0, z: 17 })
-			factory.createMineralPatch({ x: 10, y: 0, z: 17 })
-			factory.createMineralPatch({ x: 12, y: 0, z: 17 })
-			factory.createMineralPatch({ x: 14, y: 0, z: 17 })
-
-			// Player 2 (AI) starting entities (around x=108, z=108)
-			factory.createBuilding('command_center', 'player2', 'team2', { x: 108, y: 0, z: 108 }, true)
-			factory.createUnit('worker', 'player2', 'team2', { x: 106, y: 0, z: 110 })
-			factory.createUnit('worker', 'player2', 'team2', { x: 110, y: 0, z: 110 })
-			factory.createUnit('worker', 'player2', 'team2', { x: 106, y: 0, z: 106 })
-			factory.createUnit('worker', 'player2', 'team2', { x: 110, y: 0, z: 106 })
-
-			// Player 2 mineral patches (around x=114-120, z=103-113)
-			factory.createMineralPatch({ x: 114, y: 0, z: 103 })
-			factory.createMineralPatch({ x: 116, y: 0, z: 103 })
-			factory.createMineralPatch({ x: 118, y: 0, z: 103 })
-			factory.createMineralPatch({ x: 120, y: 0, z: 103 })
-			factory.createMineralPatch({ x: 114, y: 0, z: 105 })
-			factory.createMineralPatch({ x: 116, y: 0, z: 105 })
-			factory.createMineralPatch({ x: 118, y: 0, z: 105 })
-			factory.createMineralPatch({ x: 120, y: 0, z: 105 })
+			// Player 2 (AI) starting base (protoss, around x=108, z=108)
+			spawnStartingBase(factory, 'player2', 'team2', 'protoss', { x: 108, y: 0, z: 108 }, [
+				{ x: 114, y: 0, z: 103 },
+				{ x: 116, y: 0, z: 103 },
+				{ x: 118, y: 0, z: 103 },
+				{ x: 120, y: 0, z: 103 },
+				{ x: 114, y: 0, z: 105 },
+				{ x: 116, y: 0, z: 105 },
+				{ x: 118, y: 0, z: 105 },
+				{ x: 120, y: 0, z: 105 },
+			])
 
 			set({ players, isPaused: false })
 			systemManager.start()
@@ -248,7 +267,8 @@ export const useGameStore = create<GameStore>()(
 
 			// Create building entity
 			const factory = new EntityFactory(entityManager, componentManager)
-			factory.createBuilding(buildingType, 'player1', 'team1', position)
+			const player1 = state.players.get('player1')
+			factory.createBuilding(buildingType, 'player1', 'team1', position, false, player1?.faction)
 
 			audioEngine.playBuild()
 			set({ players: updatedPlayers, placementMode: null })

@@ -106,7 +106,7 @@ export function placeBuilding(factory: EntityFactory, buildingType: string): voi
 		z: 108 + offsetZ,
 	}
 
-	factory.createBuilding(buildingType, 'player2', 'team2', position)
+	factory.createBuilding(buildingType, 'player2', 'team2', position, false, def.faction)
 }
 
 export function sendWorkersToGather(entities: Entity[], em: EntityManager): void {

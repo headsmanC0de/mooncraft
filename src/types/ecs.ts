@@ -77,6 +77,7 @@ export interface OwnerComponent {
 	type: ComponentType.OWNER
 	playerId: string
 	teamId: string
+	faction: 'terran' | 'protoss'
 }
 
 export interface BuildingComponent {
@@ -198,6 +199,7 @@ export interface PlayerState {
 	id: string
 	name: string
 	teamId: string
+	faction: 'terran' | 'protoss'
 	resources: {
 		minerals: number
 		gas: number

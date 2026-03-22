@@ -17,8 +17,9 @@ export class EntityFactory {
 		private components: ComponentManager,
 	) {}
 
-	createUnit(unitType: string, playerId: string, teamId: string, position: Vector3): EntityId {
+	createUnit(unitType: string, playerId: string, teamId: string, position: Vector3, faction?: 'terran' | 'protoss'): EntityId {
 		const def = getUnitDef(unitType)
+		const resolvedFaction = faction ?? def.faction
 		const id = this.entities.createEntity()
 
 		this.components.addComponent(id, {
@@ -32,6 +33,7 @@ export class EntityFactory {
 			current: def.stats.health,
 			max: def.stats.health,
 			armor: def.stats.armor,
+			shields: def.stats.shields,
 		})
 		this.components.addComponent(id, {
 			type: ComponentType.MOVEMENT,
@@ -44,6 +46,7 @@ export class EntityFactory {
 			type: ComponentType.OWNER,
 			playerId,
 			teamId,
+			faction: resolvedFaction,
 		})
 		this.components.addComponent(id, {
 			type: ComponentType.SELECTION,
@@ -85,8 +88,10 @@ export class EntityFactory {
 		teamId: string,
 		position: Vector3,
 		preBuilt = false,
+		faction?: 'terran' | 'protoss',
 	): EntityId {
 		const def = getBuildingDef(buildingType)
+		const resolvedFaction = faction ?? def.faction
 		const id = this.entities.createEntity()
 
 		this.components.addComponent(id, {
@@ -112,6 +117,7 @@ export class EntityFactory {
 			type: ComponentType.OWNER,
 			playerId,
 			teamId,
+			faction: resolvedFaction,
 		})
 		this.components.addComponent(id, {
 			type: ComponentType.SELECTION,
