@@ -223,9 +223,17 @@ export function CommandPanel() {
 					}}
 				>
 					<CommandButton label="Move" ariaLabel="Move units" />
-					<CommandButton label="Stop [S]" ariaLabel="Stop units [S]" onClick={() => stopSelectedUnits()} />
+					<CommandButton
+						label="Stop [S]"
+						ariaLabel="Stop units [S]"
+						onClick={() => stopSelectedUnits()}
+					/>
 					<CommandButton label="Attack [A]" ariaLabel="Attack [A]" />
-					<CommandButton label="Hold [H]" ariaLabel="Hold position [H]" onClick={() => stopSelectedUnits()} />
+					<CommandButton
+						label="Hold [H]"
+						ariaLabel="Hold position [H]"
+						onClick={() => stopSelectedUnits()}
+					/>
 					<CommandButton
 						label="Build [B]"
 						ariaLabel="Open build menu [B]"
@@ -260,9 +268,17 @@ export function CommandPanel() {
 				}}
 			>
 				<CommandButton label="Move" ariaLabel="Move units" />
-				<CommandButton label="Stop [S]" ariaLabel="Stop units [S]" onClick={() => stopSelectedUnits()} />
+				<CommandButton
+					label="Stop [S]"
+					ariaLabel="Stop units [S]"
+					onClick={() => stopSelectedUnits()}
+				/>
 				<CommandButton label="Attack [A]" ariaLabel="Attack [A]" />
-				<CommandButton label="Hold [H]" ariaLabel="Hold position [H]" onClick={() => stopSelectedUnits()} />
+				<CommandButton
+					label="Hold [H]"
+					ariaLabel="Hold position [H]"
+					onClick={() => stopSelectedUnits()}
+				/>
 			</div>
 		</div>
 	)

@@ -101,7 +101,7 @@ export class ResourceSystem extends System {
 	}
 
 	private checkArrivalAtResource(
-		entity: Entity,
+		_entity: Entity,
 		carrier: ResourceCarrierComponent,
 		transform: TransformComponent,
 	): void {

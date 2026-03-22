@@ -3,11 +3,11 @@
  * Runs last so all other systems process before cleanup
  */
 
-import { ComponentType } from '@/types/ecs'
 import type { Entity, HealthComponent } from '@/types/ecs'
-import { System } from '../SystemManager'
-import { entityManager as defaultEM } from '../EntityManager'
+import { ComponentType } from '@/types/ecs'
 import type { EntityManager } from '../EntityManager'
+import { entityManager as defaultEM } from '../EntityManager'
+import { System } from '../SystemManager'
 
 export class DeathSystem extends System {
 	readonly requiredComponents = [ComponentType.HEALTH] as ComponentType[]

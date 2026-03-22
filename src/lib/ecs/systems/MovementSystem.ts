@@ -27,7 +27,11 @@ export class MovementSystem extends System {
 		}
 	}
 
-	private applySeparation(entities: Entity[], currentEntity: Entity, transform: TransformComponent): void {
+	private applySeparation(
+		entities: Entity[],
+		currentEntity: Entity,
+		transform: TransformComponent,
+	): void {
 		const separationRadius = 1.5
 		const separationForce = 0.5
 
@@ -46,7 +50,7 @@ export class MovementSystem extends System {
 
 			if (dist === 0) {
 				// Nudge in a random-ish direction based on entity ids
-				const angle = ((currentEntity.id.charCodeAt(0) - other.id.charCodeAt(0)) || 1) * 0.7854
+				const angle = (currentEntity.id.charCodeAt(0) - other.id.charCodeAt(0) || 1) * 0.7854
 				dx = Math.cos(angle)
 				dz = Math.sin(angle)
 				dist = 0.01
