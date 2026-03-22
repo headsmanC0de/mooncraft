@@ -231,6 +231,19 @@ export function InputHandler() {
 			const store = useGameStore.getState()
 			if (store.showPauseMenu || store.gameStatus !== 'playing') return
 
+			// Ctrl + 1-9: save control group
+			if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+				e.preventDefault()
+				store.setControlGroup(parseInt(e.key))
+				return
+			}
+
+			// 1-9 (without Ctrl): recall control group
+			if (!e.ctrlKey && e.key >= '1' && e.key <= '9') {
+				store.recallControlGroup(parseInt(e.key))
+				return
+			}
+
 			switch (e.key.toLowerCase()) {
 				case 'a':
 					setAttackMoveMode(true)

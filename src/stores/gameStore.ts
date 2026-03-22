@@ -104,6 +104,9 @@ interface GameStore extends GameState {
 	// Selected map (null = random)
 	selectedMapId: string | null
 
+	// Control groups
+	controlGroups: Map<number, EntityId[]>
+
 	// Actions
 	initializeGame: () => void
 	selectUnits: (ids: EntityId[], additive?: boolean) => void
@@ -113,6 +116,8 @@ interface GameStore extends GameState {
 	setPlacementMode: (mode: string | null) => void
 	placeBuilding: (buildingType: string, position: Vector3) => void
 	trainUnit: (buildingId: EntityId, unitType: string) => void
+	setControlGroup: (groupNumber: number) => void
+	recallControlGroup: (groupNumber: number) => void
 	setCameraPosition: (pos: { x: number; y: number; z: number }) => void
 	setCameraZoom: (zoom: number) => void
 	pause: () => void
@@ -140,6 +145,7 @@ export const useGameStore = create<GameStore>()(
 		playerFaction: 'terran' as 'terran' | 'protoss',
 		aiDifficulty: 'normal' as AIDifficulty,
 		selectedMapId: null,
+		controlGroups: new Map(),
 
 		initializeGame: () => {
 			// Register systems
@@ -405,6 +411,25 @@ export const useGameStore = create<GameStore>()(
 
 			audioEngine.playTrain()
 			set({ players: updatedPlayers })
+		},
+
+		setControlGroup: (groupNumber) => {
+			const { selectedUnits, controlGroups } = get()
+			if (selectedUnits.length === 0) return
+			const newGroups = new Map(controlGroups)
+			newGroups.set(groupNumber, [...selectedUnits])
+			set({ controlGroups: newGroups })
+			audioEngine.playClick()
+		},
+
+		recallControlGroup: (groupNumber) => {
+			const { controlGroups } = get()
+			const group = controlGroups.get(groupNumber)
+			if (!group || group.length === 0) return
+			// Filter out dead entities (that no longer exist)
+			const alive = group.filter((id) => entityManager.hasEntity(id))
+			if (alive.length === 0) return
+			get().selectUnits(alive)
 		},
 
 		setCameraPosition: (pos) => set({ cameraPosition: pos }),
