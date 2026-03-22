@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber'
 import { Terrain } from './Terrain'
 import { GameCamera } from './GameCamera'
 import { EntityRenderer } from './EntityRenderer'
+import { GameLoop } from './GameLoop'
 
 export function GameCanvas() {
 	return (
@@ -27,6 +28,7 @@ export function GameCanvas() {
 			/>
 			<hemisphereLight args={['#b1e1ff', '#444444', 0.6]} />
 			<fog attach="fog" args={['#0a0a0f', 80, 150]} />
+			<GameLoop />
 			<GameCamera />
 			<Terrain />
 			<EntityRenderer />
