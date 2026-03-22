@@ -1,7 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { HUD } from '@/components/hud/HUD'
+import { useGameStore } from '@/stores/gameStore'
 
 const GameCanvas = dynamic(
 	() =>
@@ -70,11 +73,28 @@ function LoadingScreen() {
 	)
 }
 
-export default function GamePage() {
+function GamePageInner() {
+	const searchParams = useSearchParams()
+	const faction = (searchParams.get('faction') as 'terran' | 'protoss') || 'terran'
+
+	// Set player faction in store before game initializes
+	const currentFaction = useGameStore((s) => s.playerFaction)
+	if (currentFaction !== faction) {
+		useGameStore.setState({ playerFaction: faction })
+	}
+
 	return (
 		<div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
 			<GameCanvas />
 			<HUD />
 		</div>
+	)
+}
+
+export default function GamePage() {
+	return (
+		<Suspense fallback={<LoadingScreen />}>
+			<GamePageInner />
+		</Suspense>
 	)
 }

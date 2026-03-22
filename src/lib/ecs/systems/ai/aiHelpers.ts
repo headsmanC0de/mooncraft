@@ -16,6 +16,33 @@ import { ComponentType } from '@/types/ecs'
 import type { EntityFactory } from '../../EntityFactory'
 import type { EntityManager } from '../../EntityManager'
 
+const FACTION_MAPPING = {
+	terran: {
+		mainBuilding: 'command_center',
+		basicMilitary: 'barracks',
+		advancedMilitary: 'factory',
+		supplyBuilding: 'supply_depot',
+		worker: 'worker',
+		basicUnit: 'marine',
+		heavyUnit: 'siege_tank',
+	},
+	protoss: {
+		mainBuilding: 'nexus',
+		basicMilitary: 'gateway',
+		advancedMilitary: 'robotics_facility',
+		supplyBuilding: 'pylon',
+		worker: 'probe',
+		basicUnit: 'zealot',
+		heavyUnit: 'colossus',
+	},
+} as const
+
+export type FactionMapping = (typeof FACTION_MAPPING)[keyof typeof FACTION_MAPPING]
+
+export function getFactionMapping(faction: 'terran' | 'protoss'): FactionMapping {
+	return FACTION_MAPPING[faction]
+}
+
 export function getPlayer2Resources() {
 	const state = useGameStore.getState()
 	return state.players.get('player2')
@@ -106,7 +133,7 @@ export function placeBuilding(factory: EntityFactory, buildingType: string): voi
 		z: 108 + offsetZ,
 	}
 
-	factory.createBuilding(buildingType, 'player2', 'team2', position)
+	factory.createBuilding(buildingType, 'player2', 'team2', position, false, def.faction)
 }
 
 export function sendWorkersToGather(entities: Entity[], em: EntityManager): void {
@@ -138,7 +165,10 @@ export function sendWorkersToGather(entities: Entity[], em: EntityManager): void
 
 		const cc = entities.find((e) => {
 			const b = e.components.get(ComponentType.BUILDING) as BuildingComponent | undefined
-			return b?.buildingType === 'command_center' && b.buildProgress >= 1
+			return (
+				(b?.buildingType === 'command_center' || b?.buildingType === 'nexus') &&
+				b.buildProgress >= 1
+			)
 		})
 		if (cc) {
 			carrier.returnBuildingId = cc.id

@@ -45,6 +45,40 @@ describe('Unit Definitions', () => {
 	})
 })
 
+describe('Protoss Units', () => {
+	it('should have probe worker', () => {
+		const probe = getUnitDef('probe')
+		expect(probe.faction).toBe('protoss')
+		expect(probe.canGather).toBe(true)
+		expect(probe.stats.shields).toBe(20)
+	})
+
+	it('should have zealot melee unit', () => {
+		const zealot = getUnitDef('zealot')
+		expect(zealot.faction).toBe('protoss')
+		expect(zealot.combat!.range).toBe(1)
+		expect(zealot.stats.shields).toBe(50)
+	})
+
+	it('should have stalker ranged unit', () => {
+		const stalker = getUnitDef('stalker')
+		expect(stalker.combat!.targetsAir).toBe(true)
+		expect(stalker.stats.shields).toBe(80)
+	})
+
+	it('should have colossus heavy unit', () => {
+		const colossus = getUnitDef('colossus')
+		expect(colossus.cost.supply).toBe(6)
+		expect(colossus.stats.shields).toBe(150)
+	})
+
+	it('all units should have faction field', () => {
+		for (const [id, def] of Object.entries(UNIT_DEFINITIONS)) {
+			expect(def.faction, `${id} missing faction`).toBeDefined()
+		}
+	})
+})
+
 describe('Building Definitions', () => {
 	it('command_center produces worker', () => {
 		const cc = getBuildingDef('command_center')
@@ -71,6 +105,31 @@ describe('Building Definitions', () => {
 
 	it('throws for unknown building', () => {
 		expect(() => getBuildingDef('nonexistent')).toThrow('Unknown building definition')
+	})
+})
+
+describe('Protoss Buildings', () => {
+	it('should have nexus', () => {
+		const nexus = getBuildingDef('nexus')
+		expect(nexus.faction).toBe('protoss')
+		expect(nexus.produces).toContain('probe')
+	})
+
+	it('should have gateway', () => {
+		const gw = getBuildingDef('gateway')
+		expect(gw.produces).toContain('zealot')
+		expect(gw.produces).toContain('stalker')
+	})
+
+	it('should have pylon with supply', () => {
+		const pylon = getBuildingDef('pylon')
+		expect(pylon.supplyProvided).toBe(8)
+	})
+
+	it('all buildings should have faction field', () => {
+		for (const [id, def] of Object.entries(BUILDING_DEFINITIONS)) {
+			expect(def.faction, `${id} missing faction`).toBeDefined()
+		}
 	})
 })
 

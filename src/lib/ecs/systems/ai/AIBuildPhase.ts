@@ -1,6 +1,6 @@
 /**
  * AI Build Phase — economy bootstrap (0-120s)
- * Trains workers, builds first supply depot and barracks
+ * Trains workers, builds first supply building and basic military
  */
 
 import type { Entity } from '@/types/ecs'
@@ -11,6 +11,7 @@ import {
 	countByType,
 	countWorkers,
 	findBuildingOfType,
+	getFactionMapping,
 	getSupplyInfo,
 	placeBuilding,
 	sendWorkersToGather,
@@ -21,28 +22,30 @@ export function executeBuildPhase(
 	entities: Entity[],
 	factory: EntityFactory,
 	em: EntityManager,
+	faction: 'terran' | 'protoss' = 'terran',
 ): void {
+	const m = getFactionMapping(faction)
 	const workerCount = countWorkers(entities)
-	const supplyDepotCount = countByType(entities, ComponentType.BUILDING, 'supply_depot')
-	const barracksCount = countByType(entities, ComponentType.BUILDING, 'barracks')
+	const supplyBuildingCount = countByType(entities, ComponentType.BUILDING, m.supplyBuilding)
+	const basicMilitaryCount = countByType(entities, ComponentType.BUILDING, m.basicMilitary)
 	const supply = getSupplyInfo(entities)
 
 	// Train workers if < 8
 	if (workerCount < 8) {
-		const cc = findBuildingOfType(entities, 'command_center')
+		const cc = findBuildingOfType(entities, m.mainBuilding)
 		if (cc && supply.used < supply.max) {
-			trainFromBuilding(cc, 'worker')
+			trainFromBuilding(cc, m.worker)
 		}
 	}
 
-	// Build supply depot if none
-	if (supplyDepotCount === 0) {
-		placeBuilding(factory, 'supply_depot')
+	// Build supply building if none
+	if (supplyBuildingCount === 0) {
+		placeBuilding(factory, m.supplyBuilding)
 	}
 
-	// Build barracks if none
-	if (barracksCount === 0) {
-		placeBuilding(factory, 'barracks')
+	// Build basic military building if none
+	if (basicMilitaryCount === 0) {
+		placeBuilding(factory, m.basicMilitary)
 	}
 
 	// Send idle workers to gather

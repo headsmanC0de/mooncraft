@@ -20,7 +20,12 @@ describe('calculateSupplyFromEntities', () => {
 	it('should count supply provided by completed buildings', () => {
 		const entities = [
 			makeEntity('b1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.BUILDING]: {
 					type: ComponentType.BUILDING,
 					buildingType: 'command_center',
@@ -38,7 +43,12 @@ describe('calculateSupplyFromEntities', () => {
 	it('should not count supply from incomplete buildings', () => {
 		const entities = [
 			makeEntity('b1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.BUILDING]: {
 					type: ComponentType.BUILDING,
 					buildingType: 'command_center',
@@ -55,7 +65,12 @@ describe('calculateSupplyFromEntities', () => {
 	it('should count workers as 1 supply used', () => {
 		const entities = [
 			makeEntity('u1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.MOVEMENT]: { type: ComponentType.MOVEMENT, speed: 5 },
 				[ComponentType.HEALTH]: { type: ComponentType.HEALTH, current: 40, max: 40, armor: 0 },
 			}),
@@ -67,7 +82,12 @@ describe('calculateSupplyFromEntities', () => {
 	it('should count siege tanks as 3 supply used', () => {
 		const entities = [
 			makeEntity('u1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.MOVEMENT]: { type: ComponentType.MOVEMENT, speed: 3 },
 				[ComponentType.HEALTH]: { type: ComponentType.HEALTH, current: 160, max: 160, armor: 1 },
 			}),
@@ -79,7 +99,12 @@ describe('calculateSupplyFromEntities', () => {
 	it('should count medivacs as 2 supply used', () => {
 		const entities = [
 			makeEntity('u1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.MOVEMENT]: { type: ComponentType.MOVEMENT, speed: 4 },
 				[ComponentType.HEALTH]: { type: ComponentType.HEALTH, current: 150, max: 150, armor: 1 },
 			}),
@@ -91,7 +116,12 @@ describe('calculateSupplyFromEntities', () => {
 	it('should ignore entities belonging to other players', () => {
 		const entities = [
 			makeEntity('u1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player2', teamId: 't2' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player2',
+					teamId: 't2',
+					faction: 'terran',
+				},
 				[ComponentType.MOVEMENT]: { type: ComponentType.MOVEMENT, speed: 5 },
 				[ComponentType.HEALTH]: { type: ComponentType.HEALTH, current: 40, max: 40, armor: 0 },
 			}),
@@ -104,7 +134,12 @@ describe('calculateSupplyFromEntities', () => {
 	it('should calculate both used and max together', () => {
 		const entities = [
 			makeEntity('b1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.BUILDING]: {
 					type: ComponentType.BUILDING,
 					buildingType: 'command_center',
@@ -114,12 +149,22 @@ describe('calculateSupplyFromEntities', () => {
 				},
 			}),
 			makeEntity('u1', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.MOVEMENT]: { type: ComponentType.MOVEMENT, speed: 5 },
 				[ComponentType.HEALTH]: { type: ComponentType.HEALTH, current: 40, max: 40, armor: 0 },
 			}),
 			makeEntity('u2', {
-				[ComponentType.OWNER]: { type: ComponentType.OWNER, playerId: 'player1', teamId: 't1' },
+				[ComponentType.OWNER]: {
+					type: ComponentType.OWNER,
+					playerId: 'player1',
+					teamId: 't1',
+					faction: 'terran',
+				},
 				[ComponentType.MOVEMENT]: { type: ComponentType.MOVEMENT, speed: 5 },
 				[ComponentType.HEALTH]: { type: ComponentType.HEALTH, current: 40, max: 40, armor: 0 },
 			}),

@@ -1,9 +1,34 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { GAME_CONFIG } from '@/config'
 
+type Faction = 'terran' | 'protoss'
+
+const factionInfo: Record<
+	Faction,
+	{ name: string; description: string; color: string; borderColor: string; icon: string }
+> = {
+	terran: {
+		name: 'Terran',
+		description: 'Versatile and mobile',
+		color: 'rgba(59, 130, 246, 0.15)',
+		borderColor: 'rgba(96, 165, 250, 0.4)',
+		icon: '\u2694',
+	},
+	protoss: {
+		name: 'Protoss',
+		description: 'Powerful shields and tech',
+		color: 'rgba(234, 179, 8, 0.15)',
+		borderColor: 'rgba(250, 204, 21, 0.4)',
+		icon: '\uD83D\uDEE1',
+	},
+}
+
 export default function Home() {
+	const [selectedFaction, setSelectedFaction] = useState<Faction>('terran')
+
 	return (
 		<main
 			style={{
@@ -88,18 +113,101 @@ export default function Home() {
 					{GAME_CONFIG.branding.tagline}
 				</p>
 
+				{/* Faction Selector */}
+				<div
+					style={{
+						marginTop: '24px',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						gap: '16px',
+					}}
+				>
+					<p
+						style={{
+							color: '#d1d5db',
+							fontSize: '1rem',
+							margin: 0,
+							letterSpacing: '0.04em',
+							textTransform: 'uppercase',
+						}}
+					>
+						Choose your faction:
+					</p>
+
+					<div style={{ display: 'flex', gap: '16px' }}>
+						{(Object.keys(factionInfo) as Faction[]).map((faction) => {
+							const info = factionInfo[faction]
+							const isSelected = selectedFaction === faction
+							return (
+								<button
+									key={faction}
+									type="button"
+									onClick={() => setSelectedFaction(faction)}
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										gap: '6px',
+										padding: '20px 28px',
+										background: isSelected ? info.color : 'rgba(255,255,255,0.03)',
+										border: isSelected ? '2px solid #00ff88' : `1px solid ${info.borderColor}`,
+										borderRadius: '10px',
+										cursor: 'pointer',
+										transition: 'all 0.15s ease',
+										minWidth: '140px',
+									}}
+									onMouseEnter={(e) => {
+										if (!isSelected) {
+											e.currentTarget.style.background = info.color
+											e.currentTarget.style.borderColor = info.borderColor
+										}
+									}}
+									onMouseLeave={(e) => {
+										if (!isSelected) {
+											e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+											e.currentTarget.style.borderColor = info.borderColor
+										}
+									}}
+								>
+									<span style={{ fontSize: '1.5rem' }}>{info.icon}</span>
+									<span
+										style={{
+											color: '#f3f4f6',
+											fontWeight: 700,
+											fontSize: '1rem',
+											letterSpacing: '0.06em',
+											textTransform: 'uppercase',
+										}}
+									>
+										{info.name}
+									</span>
+									<span
+										style={{
+											color: '#9ca3af',
+											fontSize: '0.8rem',
+										}}
+									>
+										{info.description}
+									</span>
+								</button>
+							)
+						})}
+					</div>
+				</div>
+
 				{/* Buttons */}
 				<div
 					style={{
 						display: 'flex',
 						flexDirection: 'column',
 						gap: '12px',
-						marginTop: '36px',
+						marginTop: '24px',
 						width: '260px',
 					}}
 				>
 					<Link
-						href="/game"
+						href={`/game?faction=${selectedFaction}`}
 						style={{
 							display: 'flex',
 							alignItems: 'center',
