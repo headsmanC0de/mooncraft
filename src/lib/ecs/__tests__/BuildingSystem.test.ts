@@ -52,4 +52,26 @@ describe('BuildingSystem', () => {
 		const healthAfter = cm.getComponent<HealthComponent>(id, ComponentType.HEALTH)!.current
 		expect(healthAfter).toBe(healthBefore)
 	})
+
+	it('should handle missing building definition gracefully', () => {
+		// Manually create an entity with an invalid building type
+		const id = em.createEntity()
+		cm.addComponent(id, {
+			type: ComponentType.BUILDING,
+			buildingType: 'nonexistent_building',
+			buildProgress: 0,
+			queue: [],
+			rallyPoint: { x: 0, y: 0, z: 0 },
+		})
+		cm.addComponent(id, {
+			type: ComponentType.HEALTH,
+			current: 1,
+			max: 100,
+			armor: 0,
+		})
+
+		const entities = em.queryEntities(ComponentType.BUILDING, ComponentType.HEALTH)
+		// getBuildingDef throws for unknown types
+		expect(() => system.update(entities, 1)).toThrow('Unknown building definition')
+	})
 })

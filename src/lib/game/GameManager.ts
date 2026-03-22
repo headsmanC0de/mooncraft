@@ -12,6 +12,11 @@ export type GameStatus = 'playing' | 'victory' | 'defeat'
 
 let gameStarted = false
 
+/** Reset game status for testing */
+export function resetGameStatus(): void {
+	gameStarted = false
+}
+
 export function checkGameStatus(): GameStatus {
 	const buildings = entityManager.queryEntities(ComponentType.BUILDING, ComponentType.OWNER)
 

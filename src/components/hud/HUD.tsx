@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
 import { CommandPanel } from './CommandPanel'
 import { GameOverScreen } from './GameOverScreen'
@@ -10,8 +11,16 @@ import { SelectionPanel } from './SelectionPanel'
 export function HUD() {
 	const gameStatus = useGameStore((s) => s.gameStatus)
 
+	useEffect(() => {
+		// Expose gameStore on window in dev mode for E2E testing
+		if (process.env.NODE_ENV === 'development') {
+			;(window as any).__gameStore = useGameStore
+		}
+	}, [])
+
 	return (
-		<div
+		<section
+			aria-label="Game HUD"
 			style={{
 				position: 'fixed',
 				inset: 0,
@@ -22,7 +31,9 @@ export function HUD() {
 				justifyContent: 'space-between',
 			}}
 		>
-			<ResourceBar />
+			<div role="status" aria-live="polite">
+				<ResourceBar />
+			</div>
 			<div
 				style={{
 					display: 'flex',
@@ -32,10 +43,12 @@ export function HUD() {
 				}}
 			>
 				<SelectionPanel />
-				<Minimap />
+				<aside aria-label="Minimap">
+					<Minimap />
+				</aside>
 				<CommandPanel />
 			</div>
 			{gameStatus !== 'playing' && <GameOverScreen status={gameStatus} />}
-		</div>
+		</section>
 	)
 }

@@ -16,7 +16,7 @@ describe('ResourceSystem', () => {
 		em = new EntityManager()
 		cm = new ComponentManager(em)
 		factory = new EntityFactory(em, cm)
-		system = new ResourceSystem(em, cm)
+		system = new ResourceSystem(cm)
 	})
 
 	it('should gather resources when worker is at mineral patch', () => {
@@ -90,5 +90,24 @@ describe('ResourceSystem', () => {
 		)
 		const resource = cm.getComponent<ResourceComponent>(mineralId, ComponentType.RESOURCE)
 		expect(resource!.amount).toBe(0)
+	})
+
+	it('should handle gathering from already depleted resource', () => {
+		const mineralId = factory.createMineralPatch({ x: 5, y: 0, z: 5 }, 0)
+		const workerId = factory.createUnit('worker', 'p1', 't1', { x: 5, y: 0, z: 5 })
+		cm.updateComponent(workerId, ComponentType.RESOURCE_CARRIER, {
+			state: 'gathering' as const,
+			targetResourceId: mineralId,
+		})
+
+		const entities = em.queryEntities(ComponentType.RESOURCE_CARRIER, ComponentType.TRANSFORM)
+		system.update(entities, 5)
+
+		const carrier = cm.getComponent<ResourceCarrierComponent>(
+			workerId,
+			ComponentType.RESOURCE_CARRIER,
+		)
+		expect(carrier!.state).toBe('idle')
+		expect(carrier!.targetResourceId).toBeNull()
 	})
 })
