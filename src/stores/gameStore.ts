@@ -27,6 +27,7 @@ import {
 import type { GameStatus } from '@/lib/game/GameManager'
 import { calculateSupplyFromEntities } from '@/lib/game/supply'
 import { canBuild } from '@/lib/game/techTree'
+import type { AIDifficulty } from '@/lib/ecs/systems/AISystem'
 import type { BuildingComponent, EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
@@ -96,6 +97,9 @@ interface GameStore extends GameState {
 	// Player faction selection
 	playerFaction: 'terran' | 'protoss'
 
+	// AI difficulty
+	aiDifficulty: AIDifficulty
+
 	// Actions
 	initializeGame: () => void
 	selectUnits: (ids: EntityId[], additive?: boolean) => void
@@ -129,6 +133,7 @@ export const useGameStore = create<GameStore>()(
 		showPauseMenu: false,
 		gameStatus: 'playing' as GameStatus,
 		playerFaction: 'terran' as 'terran' | 'protoss',
+		aiDifficulty: 'normal' as AIDifficulty,
 
 		initializeGame: () => {
 			// Register systems
@@ -154,7 +159,7 @@ export const useGameStore = create<GameStore>()(
 				}
 			})
 			systemManager.registerSystem(resourceSystem)
-			systemManager.registerSystem(new AISystem())
+			systemManager.registerSystem(new AISystem(undefined, undefined, get().aiDifficulty))
 			systemManager.registerSystem(new VisionSystem())
 
 			// Determine factions based on player selection

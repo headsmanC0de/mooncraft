@@ -13,4 +13,30 @@ export const GAME_CONFIG = {
 		edgeScrollThreshold: 30,
 	},
 	tickRate: 60,
+	aiDifficulty: {
+		easy: {
+			decisionInterval: 5,
+			buildPhaseEnd: 180,
+			expandPhaseEnd: 480,
+			attackTime: 600,
+			workerCap: 6,
+			label: 'Easy',
+		},
+		normal: {
+			decisionInterval: 3,
+			buildPhaseEnd: 120,
+			expandPhaseEnd: 300,
+			attackTime: 300,
+			workerCap: 10,
+			label: 'Normal',
+		},
+		hard: {
+			decisionInterval: 2,
+			buildPhaseEnd: 60,
+			expandPhaseEnd: 150,
+			attackTime: 180,
+			workerCap: 14,
+			label: 'Hard',
+		},
+	},
 } as const
