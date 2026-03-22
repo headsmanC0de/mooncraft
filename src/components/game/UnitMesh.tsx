@@ -23,17 +23,37 @@ function getHealthColor(percent: number): string {
 	return '#ff0000'
 }
 
-function getUnitScale(maxHealth: number): number {
-	// Workers (40hp) are smaller, marines (80hp) normal, tanks (160hp) bigger
-	if (maxHealth <= 50) return 0.7
-	if (maxHealth >= 150) return 1.3
-	return 1.0
+function getUnitGeometry(scale: number) {
+	if (scale <= 0.85) {
+		// Worker — small sphere
+		return <sphereGeometry args={[0.3, 8, 6]} />
+	} else if (scale >= 1.45) {
+		// Colossus — tall thin box with legs
+		return <boxGeometry args={[0.3, 1.0, 0.3]} />
+	} else if (scale >= 1.35) {
+		// Flying/heavy — flat disc
+		return <cylinderGeometry args={[0.5, 0.4, 0.3, 8]} />
+	} else if (scale >= 1.15) {
+		// Vehicle — box
+		return <boxGeometry args={[0.6, 0.4, 0.8]} />
+	} else if (scale >= 1.05) {
+		// Stalker — tall capsule
+		return <capsuleGeometry args={[0.2, 0.7, 4, 8]} />
+	} else {
+		// Standard infantry — capsule (marine/zealot)
+		return <capsuleGeometry args={[0.25, 0.5, 4, 8]} />
+	}
+}
+
+function isInfantryOrAbove(scale: number): boolean {
+	// Show weapon detail for combat-sized units (not workers)
+	return scale > 0.85
 }
 
 export function UnitMesh({ transform, health, selection, render }: UnitMeshProps) {
 	const healthBarRef = useRef<Group>(null)
 	const healthPercent = health.max > 0 ? health.current / health.max : 0
-	const unitScale = getUnitScale(health.max)
+	const modelScale = transform.scale.x
 
 	useFrame(({ camera }) => {
 		if (healthBarRef.current) {
@@ -48,26 +68,38 @@ export function UnitMesh({ transform, health, selection, render }: UnitMeshProps
 		>
 			{/* Shadow disc */}
 			<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.48, 0]}>
-				<circleGeometry args={[0.5 * unitScale, 16]} />
+				<circleGeometry args={[0.5 * modelScale, 16]} />
 				<meshBasicMaterial color="#000000" transparent opacity={0.3} />
 			</mesh>
 
-			{/* Capsule body */}
-			<mesh castShadow scale={[unitScale, unitScale, unitScale]}>
-				<capsuleGeometry args={[0.3, 0.6, 4, 8]} />
+			{/* Unit body — shape varies by type */}
+			<mesh castShadow scale={[modelScale, modelScale, modelScale]}>
+				{getUnitGeometry(modelScale)}
 				<meshStandardMaterial color={render.color ?? '#4488ff'} />
 			</mesh>
+
+			{/* Weapon detail for combat units */}
+			{isInfantryOrAbove(modelScale) && (
+				<mesh
+					castShadow
+					position={[0, 0, 0.4 * modelScale]}
+					scale={[modelScale, modelScale, modelScale]}
+				>
+					<boxGeometry args={[0.08, 0.08, 0.25]} />
+					<meshStandardMaterial color={render.color ?? '#4488ff'} />
+				</mesh>
+			)}
 
 			{/* Selection ring */}
 			{selection.isSelected && (
 				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
-					<ringGeometry args={[0.5 * unitScale, 0.6 * unitScale, 32]} />
+					<ringGeometry args={[0.5 * modelScale, 0.6 * modelScale, 32]} />
 					<meshBasicMaterial color="#00ff88" transparent opacity={0.8} />
 				</mesh>
 			)}
 
 			{/* Health bar (billboard) */}
-			<group ref={healthBarRef} position={[0, 1.0 * unitScale, 0]}>
+			<group ref={healthBarRef} position={[0, 1.0 * modelScale, 0]}>
 				{/* Background */}
 				<mesh position={[0, 0, -0.001]}>
 					<planeGeometry args={[1.0, 0.1]} />
