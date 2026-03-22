@@ -3,6 +3,7 @@
 import { Canvas } from '@react-three/fiber'
 import { Terrain } from './Terrain'
 import { GameCamera } from './GameCamera'
+import { EntityRenderer } from './EntityRenderer'
 
 export function GameCanvas() {
 	return (
@@ -28,6 +29,7 @@ export function GameCanvas() {
 			<fog attach="fog" args={['#0a0a0f', 80, 150]} />
 			<GameCamera />
 			<Terrain />
+			<EntityRenderer />
 		</Canvas>
 	)
 }
