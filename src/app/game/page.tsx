@@ -76,11 +76,19 @@ function LoadingScreen() {
 function GamePageInner() {
 	const searchParams = useSearchParams()
 	const faction = (searchParams.get('faction') as 'terran' | 'protoss') || 'terran'
+	const difficulty = (searchParams.get('difficulty') as 'easy' | 'normal' | 'hard') || 'normal'
+	const mapId = searchParams.get('map') || 'random'
 
-	// Set player faction in store before game initializes
+	// Set player faction, difficulty, and map in store before game initializes
 	const currentFaction = useGameStore((s) => s.playerFaction)
-	if (currentFaction !== faction) {
-		useGameStore.setState({ playerFaction: faction })
+	const currentDifficulty = useGameStore((s) => s.aiDifficulty)
+	const currentMapId = useGameStore((s) => s.selectedMapId)
+	if (currentFaction !== faction || currentDifficulty !== difficulty || currentMapId !== mapId) {
+		useGameStore.setState({
+			playerFaction: faction,
+			aiDifficulty: difficulty,
+			selectedMapId: mapId !== 'random' ? mapId : null,
+		})
 	}
 
 	return (

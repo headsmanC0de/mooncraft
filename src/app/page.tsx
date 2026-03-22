@@ -2,7 +2,10 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { GAME_CONFIG } from '@/config'
+import { GAME_CONFIG, MAP_DEFINITIONS } from '@/config'
+
+type Difficulty = 'easy' | 'normal' | 'hard'
+type MapOption = 'random' | string
 
 type Faction = 'terran' | 'protoss'
 
@@ -28,6 +31,8 @@ const factionInfo: Record<
 
 export default function Home() {
 	const [selectedFaction, setSelectedFaction] = useState<Faction>('terran')
+	const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('normal')
+	const [selectedMap, setSelectedMap] = useState<MapOption>('random')
 
 	return (
 		<main
@@ -196,6 +201,114 @@ export default function Home() {
 					</div>
 				</div>
 
+				{/* Difficulty Selector */}
+				<div
+					style={{
+						marginTop: '16px',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						gap: '10px',
+					}}
+				>
+					<p
+						style={{
+							color: '#d1d5db',
+							fontSize: '0.85rem',
+							margin: 0,
+							letterSpacing: '0.04em',
+							textTransform: 'uppercase',
+						}}
+					>
+						Difficulty:
+					</p>
+					<div style={{ display: 'flex', gap: '8px' }}>
+						{(['easy', 'normal', 'hard'] as Difficulty[]).map((diff) => {
+							const isSelected = selectedDifficulty === diff
+							const label = GAME_CONFIG.aiDifficulty[diff].label
+							return (
+								<button
+									key={diff}
+									type="button"
+									onClick={() => setSelectedDifficulty(diff)}
+									style={{
+										padding: '8px 18px',
+										background: isSelected
+											? 'rgba(0, 255, 136, 0.1)'
+											: 'rgba(255,255,255,0.03)',
+										border: isSelected
+											? '2px solid #00ff88'
+											: '1px solid rgba(255,255,255,0.15)',
+										borderRadius: '6px',
+										color: isSelected ? '#00ff88' : '#d1d5db',
+										fontWeight: isSelected ? 700 : 500,
+										fontSize: '0.85rem',
+										letterSpacing: '0.04em',
+										textTransform: 'uppercase',
+										cursor: 'pointer',
+										transition: 'all 0.15s ease',
+									}}
+								>
+									{label}
+								</button>
+							)
+						})}
+					</div>
+				</div>
+
+				{/* Map Selector */}
+				<div
+					style={{
+						marginTop: '12px',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						gap: '10px',
+					}}
+				>
+					<p
+						style={{
+							color: '#d1d5db',
+							fontSize: '0.85rem',
+							margin: 0,
+							letterSpacing: '0.04em',
+							textTransform: 'uppercase',
+						}}
+					>
+						Map:
+					</p>
+					<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+						{[{ id: 'random', name: 'Random' }, ...MAP_DEFINITIONS].map((map) => {
+							const isSelected = selectedMap === map.id
+							return (
+								<button
+									key={map.id}
+									type="button"
+									onClick={() => setSelectedMap(map.id)}
+									style={{
+										padding: '6px 14px',
+										background: isSelected
+											? 'rgba(0, 255, 136, 0.1)'
+											: 'rgba(255,255,255,0.03)',
+										border: isSelected
+											? '2px solid #00ff88'
+											: '1px solid rgba(255,255,255,0.15)',
+										borderRadius: '6px',
+										color: isSelected ? '#00ff88' : '#d1d5db',
+										fontWeight: isSelected ? 700 : 500,
+										fontSize: '0.8rem',
+										letterSpacing: '0.03em',
+										cursor: 'pointer',
+										transition: 'all 0.15s ease',
+									}}
+								>
+									{map.name}
+								</button>
+							)
+						})}
+					</div>
+				</div>
+
 				{/* Buttons */}
 				<div
 					style={{
@@ -207,7 +320,7 @@ export default function Home() {
 					}}
 				>
 					<Link
-						href={`/game?faction=${selectedFaction}`}
+						href={`/game?faction=${selectedFaction}&difficulty=${selectedDifficulty}&map=${selectedMap}`}
 						style={{
 							display: 'flex',
 							alignItems: 'center',

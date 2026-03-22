@@ -7,7 +7,7 @@ import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { getBuildingDef } from '@/config/buildings'
 import type { MapDefinition } from '@/config/maps'
-import { getRandomMap } from '@/config/maps'
+import { getMapById, getRandomMap } from '@/config/maps'
 import { getUnitDef } from '@/config/units'
 import { audioEngine } from '@/lib/audio'
 import {
@@ -100,6 +100,9 @@ interface GameStore extends GameState {
 	// AI difficulty
 	aiDifficulty: AIDifficulty
 
+	// Selected map (null = random)
+	selectedMapId: string | null
+
 	// Actions
 	initializeGame: () => void
 	selectUnits: (ids: EntityId[], additive?: boolean) => void
@@ -134,6 +137,7 @@ export const useGameStore = create<GameStore>()(
 		gameStatus: 'playing' as GameStatus,
 		playerFaction: 'terran' as 'terran' | 'protoss',
 		aiDifficulty: 'normal' as AIDifficulty,
+		selectedMapId: null,
 
 		initializeGame: () => {
 			// Register systems
@@ -185,8 +189,8 @@ export const useGameStore = create<GameStore>()(
 				isAlive: true,
 			})
 
-			// Pick a random map
-			const map = getRandomMap()
+			// Pick map based on selection
+			const map = get().selectedMapId ? getMapById(get().selectedMapId!) : getRandomMap()
 
 			// Spawn starting entities
 			const factory = new EntityFactory(entityManager, componentManager)
