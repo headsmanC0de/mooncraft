@@ -4,8 +4,8 @@ export const GAME_CONFIG = {
 	map: { width: 128, height: 128, tileSize: 1 },
 	mineralPatch: { amount: 1500, gatherRate: 5, gatherInterval: 2 },
 	camera: {
-		initialPosition: { x: 40, y: 50, z: 40 },
-		initialZoom: 30,
+		initialPosition: { x: 20, y: 25, z: 20 },
+		initialZoom: 20,
 		minZoom: 15,
 		maxZoom: 80,
 		panSpeed: 40,

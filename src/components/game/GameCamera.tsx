@@ -10,7 +10,13 @@ const keys = new Set<string>()
 
 export function GameCamera() {
 	const { camera } = useThree()
-	const target = useRef(new THREE.Vector3(64, 0, 64))
+	const target = useRef(
+		new THREE.Vector3(
+			GAME_CONFIG.camera.initialPosition.x,
+			0,
+			GAME_CONFIG.camera.initialPosition.z,
+		),
+	)
 
 	useEffect(() => {
 		const cam = GAME_CONFIG.camera
