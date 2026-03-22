@@ -490,10 +490,34 @@ export const useGameStore = create<GameStore>()(
 			if (isPaused) return
 
 			systemManager.update(delta * speed)
-			set((state) => ({
-				currentTick: state.currentTick + 1,
-				elapsedTime: state.elapsedTime + delta * speed,
-			}))
+
+			// Recalculate supply for display
+			const allEntities = entityManager.getAllEntities()
+			const p1Supply = calculateSupplyFromEntities(allEntities, 'player1')
+			const p2Supply = calculateSupplyFromEntities(allEntities, 'player2')
+
+			set((state) => {
+				const players = new Map(state.players)
+				const p1 = players.get('player1')
+				const p2 = players.get('player2')
+				if (p1) {
+					players.set('player1', {
+						...p1,
+						resources: { ...p1.resources, supply: p1Supply.used, maxSupply: p1Supply.max },
+					})
+				}
+				if (p2) {
+					players.set('player2', {
+						...p2,
+						resources: { ...p2.resources, supply: p2Supply.used, maxSupply: p2Supply.max },
+					})
+				}
+				return {
+					players,
+					currentTick: state.currentTick + 1,
+					elapsedTime: state.elapsedTime + delta * speed,
+				}
+			})
 		},
 	})),
 )
