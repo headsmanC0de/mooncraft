@@ -10,6 +10,8 @@ import type { BuildingComponent, OwnerComponent } from '@/types/ecs'
 
 export type GameStatus = 'playing' | 'victory' | 'defeat'
 
+let gameStarted = false
+
 export function checkGameStatus(): GameStatus {
 	const buildings = entityManager.queryEntities(ComponentType.BUILDING, ComponentType.OWNER)
 
@@ -21,11 +23,18 @@ export function checkGameStatus(): GameStatus {
 		const building = entity.components.get(ComponentType.BUILDING) as BuildingComponent
 		if (!owner || !building) continue
 
-		// Only count completed buildings
 		if (building.buildProgress >= 1) {
 			if (owner.playerId === 'player1') player1HasBuildings = true
 			if (owner.playerId === 'player2') player2HasBuildings = true
 		}
+	}
+
+	// Don't check win/lose until both players have had buildings
+	if (!gameStarted) {
+		if (player1HasBuildings && player2HasBuildings) {
+			gameStarted = true
+		}
+		return 'playing'
 	}
 
 	if (!player1HasBuildings) return 'defeat'
