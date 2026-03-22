@@ -6,6 +6,8 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { getBuildingDef } from '@/config/buildings'
+import type { MapDefinition } from '@/config/maps'
+import { getRandomMap } from '@/config/maps'
 import { getUnitDef } from '@/config/units'
 import { audioEngine } from '@/lib/audio'
 import {
@@ -35,6 +37,7 @@ function spawnStartingBase(
 	faction: 'terran' | 'protoss',
 	basePosition: Vector3,
 	mineralPositions: Vector3[],
+	gasGeyserPosition: Vector3,
 ) {
 	const mainBuilding = faction === 'terran' ? 'command_center' : 'nexus'
 	const workerType = faction === 'terran' ? 'worker' : 'probe'
@@ -66,15 +69,15 @@ function spawnStartingBase(
 	for (const pos of mineralPositions) {
 		factory.createMineralPatch(pos)
 	}
-}
 
-function spawnGasGeysers(factory: EntityFactory) {
-	// One gas geyser near each base
-	factory.createGasGeyser({ x: 25, y: 0, z: 12 })
-	factory.createGasGeyser({ x: 113, y: 0, z: 100 })
+	// Create gas geyser
+	factory.createGasGeyser(gasGeyserPosition)
 }
 
 interface GameStore extends GameState {
+	// Map
+	currentMap: MapDefinition | null
+
 	// Selection
 	selectedUnits: EntityId[]
 
@@ -117,6 +120,7 @@ export const useGameStore = create<GameStore>()(
 		players: new Map(),
 		isPaused: true,
 		speed: 1,
+		currentMap: null,
 		selectedUnits: [],
 		cameraPosition: { x: 40, y: 50, z: 40 },
 		cameraZoom: 30,
@@ -176,37 +180,35 @@ export const useGameStore = create<GameStore>()(
 				isAlive: true,
 			})
 
+			// Pick a random map
+			const map = getRandomMap()
+
 			// Spawn starting entities
 			const factory = new EntityFactory(entityManager, componentManager)
 
-			// Player 1 starting base (around x=20, z=20)
-			spawnStartingBase(factory, 'player1', 'team1', playerFaction, { x: 20, y: 0, z: 20 }, [
-				{ x: 8, y: 0, z: 15 },
-				{ x: 10, y: 0, z: 15 },
-				{ x: 12, y: 0, z: 15 },
-				{ x: 14, y: 0, z: 15 },
-				{ x: 8, y: 0, z: 17 },
-				{ x: 10, y: 0, z: 17 },
-				{ x: 12, y: 0, z: 17 },
-				{ x: 14, y: 0, z: 17 },
-			])
+			// Player 1 starting base
+			spawnStartingBase(
+				factory, 'player1', 'team1', playerFaction,
+				map.player1.base, map.player1.minerals, map.player1.gasGeyser,
+			)
 
-			// Player 2 (AI) starting base (around x=108, z=108)
-			spawnStartingBase(factory, 'player2', 'team2', aiFaction, { x: 108, y: 0, z: 108 }, [
-				{ x: 114, y: 0, z: 103 },
-				{ x: 116, y: 0, z: 103 },
-				{ x: 118, y: 0, z: 103 },
-				{ x: 120, y: 0, z: 103 },
-				{ x: 114, y: 0, z: 105 },
-				{ x: 116, y: 0, z: 105 },
-				{ x: 118, y: 0, z: 105 },
-				{ x: 120, y: 0, z: 105 },
-			])
+			// Player 2 (AI) starting base
+			spawnStartingBase(
+				factory, 'player2', 'team2', aiFaction,
+				map.player2.base, map.player2.minerals, map.player2.gasGeyser,
+			)
 
-			// Spawn gas geysers near each base
-			spawnGasGeysers(factory)
-
-			set({ players, isPaused: false })
+			// Set camera to player 1's base
+			set({
+				players,
+				isPaused: false,
+				currentMap: map,
+				cameraPosition: {
+					x: map.player1.base.x,
+					y: 25,
+					z: map.player1.base.z,
+				},
+			})
 			systemManager.start()
 		},
 
