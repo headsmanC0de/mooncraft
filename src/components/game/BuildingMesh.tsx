@@ -101,6 +101,22 @@ export function BuildingMesh({
 						<planeGeometry args={[1.2 * healthPercent, 0.1]} />
 						<meshBasicMaterial color={getHealthColor(healthPercent)} />
 					</mesh>
+
+					{/* Shield bar - only for buildings with shields */}
+					{health.maxShields != null && health.maxShields > 0 && (
+						<group position={[0, 0.15, 0]}>
+							{/* Background */}
+							<mesh>
+								<planeGeometry args={[1.2, 0.08]} />
+								<meshBasicMaterial color="#222244" />
+							</mesh>
+							{/* Shield fill */}
+							<mesh position={[((health.shields ?? 0) / health.maxShields - 1) * 0.6, 0, 0.01]}>
+								<planeGeometry args={[1.2 * (health.shields ?? 0) / health.maxShields, 0.06]} />
+								<meshBasicMaterial color="#4488ff" />
+							</mesh>
+						</group>
+					)}
 				</group>
 			)}
 		</group>
