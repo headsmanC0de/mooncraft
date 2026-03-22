@@ -157,6 +157,7 @@ export const useGameStore = create<GameStore>()(
 	subscribeWithSelector((set, get) => ({
 		// Initial state
 		currentTick: 0,
+		elapsedTime: 0,
 		entities: new Map(),
 		players: new Map(),
 		isPaused: true,
@@ -489,7 +490,10 @@ export const useGameStore = create<GameStore>()(
 			if (isPaused) return
 
 			systemManager.update(delta * speed)
-			set((state) => ({ currentTick: state.currentTick + 1 }))
+			set((state) => ({
+				currentTick: state.currentTick + 1,
+				elapsedTime: state.elapsedTime + delta * speed,
+			}))
 		},
 	})),
 )

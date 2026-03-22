@@ -4,7 +4,7 @@ import { useGameStore } from '@/stores/gameStore'
 
 export function ResourceBar() {
 	const players = useGameStore((s) => s.players)
-	const currentTick = useGameStore((s) => s.currentTick)
+	const elapsedTime = useGameStore((s) => s.elapsedTime)
 
 	const player = players.get('player1')
 	const minerals = player?.resources.minerals ?? 0
@@ -12,7 +12,7 @@ export function ResourceBar() {
 	const supply = player?.resources.supply ?? 0
 	const maxSupply = player?.resources.maxSupply ?? 0
 
-	const totalSeconds = Math.floor(currentTick / 60)
+	const totalSeconds = Math.floor(elapsedTime)
 	const minutes = Math.floor(totalSeconds / 60)
 	const seconds = totalSeconds % 60
 	const timeStr = `${minutes}:${String(seconds).padStart(2, '0')}`
