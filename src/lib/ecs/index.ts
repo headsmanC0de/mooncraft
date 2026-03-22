@@ -3,10 +3,10 @@
  * SSOT: Single entry point for ECS imports
  */
 
-export { EntityManager, entityManager } from './EntityManager'
 export { ComponentManager, componentManager } from './ComponentManager'
-export { SystemManager, systemManager, System } from './SystemManager'
-
+export { EntityFactory } from './EntityFactory'
+export { EntityManager, entityManager } from './EntityManager'
+export { System, SystemManager, systemManager } from './SystemManager'
+export { CombatSystem } from './systems/CombatSystem'
 // Systems
 export { MovementSystem } from './systems/MovementSystem'
-export { CombatSystem } from './systems/CombatSystem'
