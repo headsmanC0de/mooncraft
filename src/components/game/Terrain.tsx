@@ -8,7 +8,7 @@ export function Terrain() {
 	const { width, height } = GAME_CONFIG.map
 
 	const gridHelper = useMemo(() => {
-		const grid = new THREE.GridHelper(width, width, '#2a3a2a', '#1a2a1a')
+		const grid = new THREE.GridHelper(width, width, '#3a4a3a', '#2a3a2a')
 		grid.position.set(width / 2, 0.01, height / 2)
 		return grid
 	}, [width, height])
@@ -19,7 +19,7 @@ export function Terrain() {
 		canvas.width = size
 		canvas.height = size
 		const ctx = canvas.getContext('2d')!
-		ctx.fillStyle = '#1e2e1e'
+		ctx.fillStyle = '#2a3a2a'
 		ctx.fillRect(0, 0, size, size)
 
 		// Subtle noise-like color variation
@@ -29,8 +29,8 @@ export function Terrain() {
 					Math.sin(x * 0.05) * Math.cos(y * 0.07) * 0.5 +
 					Math.sin(x * 0.13 + y * 0.09) * 0.3 +
 					Math.random() * 0.2
-				const brightness = Math.floor(28 + noise * 12)
-				const green = Math.floor(42 + noise * 16)
+				const brightness = Math.floor(38 + noise * 14)
+				const green = Math.floor(54 + noise * 18)
 				ctx.fillStyle = `rgb(${brightness}, ${green}, ${brightness})`
 				ctx.fillRect(x, y, 4, 4)
 			}

@@ -29,7 +29,7 @@ import type { AIDifficulty } from '@/lib/ecs/systems/AISystem'
 import type { GameStatus } from '@/lib/game/GameManager'
 import { calculateSupplyFromEntities } from '@/lib/game/supply'
 import { canBuild } from '@/lib/game/techTree'
-import type { BuildingComponent, EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
+import type { BuildingComponent, EntityId, GameState, PlayerState, ResourceComponent, TransformComponent, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
 function spawnStartingBase(
@@ -47,6 +47,7 @@ function spawnStartingBase(
 	factory.createBuilding(mainBuilding, playerId, teamId, basePosition, true, faction)
 
 	// Create 4 workers around base
+	const workerIds: string[] = []
 	const offsets = [
 		{ x: -2, z: 2 },
 		{ x: 2, z: 2 },
@@ -54,7 +55,7 @@ function spawnStartingBase(
 		{ x: 2, z: -2 },
 	]
 	for (const offset of offsets) {
-		factory.createUnit(
+		const id = factory.createUnit(
 			workerType,
 			playerId,
 			teamId,
@@ -65,6 +66,7 @@ function spawnStartingBase(
 			},
 			faction,
 		)
+		workerIds.push(id)
 	}
 
 	// Create mineral patches
@@ -74,6 +76,31 @@ function spawnStartingBase(
 
 	// Create gas geyser
 	factory.createGasGeyser(gasGeyserPosition)
+
+	// Auto-assign workers to gather minerals
+	workerIds.forEach((workerId, index) => {
+		const mineralIndex = index % mineralPositions.length
+		const allEntities = entityManager.getAllEntities()
+		for (const entity of allEntities) {
+			const resource = componentManager.getComponent<ResourceComponent>(entity.id, ComponentType.RESOURCE)
+			const transform = componentManager.getComponent<TransformComponent>(entity.id, ComponentType.TRANSFORM)
+			if (!resource || !transform || resource.resourceType !== 'mineral') continue
+
+			const dx = transform.position.x - mineralPositions[mineralIndex].x
+			const dz = transform.position.z - mineralPositions[mineralIndex].z
+			if (Math.sqrt(dx * dx + dz * dz) < 1) {
+				componentManager.updateComponent(workerId, ComponentType.RESOURCE_CARRIER, {
+					state: 'moving_to_resource',
+					targetResourceId: entity.id,
+				})
+				componentManager.updateComponent(workerId, ComponentType.MOVEMENT, {
+					targetPosition: { ...transform.position },
+					isMoving: true,
+				})
+				break
+			}
+		}
+	})
 }
 
 interface GameStore extends GameState {
