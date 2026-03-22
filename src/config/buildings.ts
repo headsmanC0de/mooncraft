@@ -1,6 +1,7 @@
 export interface BuildingDefinition {
 	id: string
 	name: string
+	faction: 'terran' | 'protoss'
 	cost: { minerals: number; gas: number }
 	buildTime: number
 	stats: { health: number; armor: number; sight: number }
@@ -15,6 +16,7 @@ export const BUILDING_DEFINITIONS: Record<string, BuildingDefinition> = {
 	command_center: {
 		id: 'command_center',
 		name: 'Command Center',
+		faction: 'terran',
 		cost: { minerals: 400, gas: 0 },
 		buildTime: 60,
 		stats: { health: 1500, armor: 1, sight: 10 },
@@ -27,6 +29,7 @@ export const BUILDING_DEFINITIONS: Record<string, BuildingDefinition> = {
 	barracks: {
 		id: 'barracks',
 		name: 'Barracks',
+		faction: 'terran',
 		cost: { minerals: 150, gas: 0 },
 		buildTime: 40,
 		stats: { health: 1000, armor: 1, sight: 9 },
@@ -39,6 +42,7 @@ export const BUILDING_DEFINITIONS: Record<string, BuildingDefinition> = {
 	factory: {
 		id: 'factory',
 		name: 'Factory',
+		faction: 'terran',
 		cost: { minerals: 150, gas: 100 },
 		buildTime: 45,
 		stats: { health: 1250, armor: 1, sight: 9 },
@@ -51,6 +55,7 @@ export const BUILDING_DEFINITIONS: Record<string, BuildingDefinition> = {
 	supply_depot: {
 		id: 'supply_depot',
 		name: 'Supply Depot',
+		faction: 'terran',
 		cost: { minerals: 100, gas: 0 },
 		buildTime: 20,
 		stats: { health: 400, armor: 0, sight: 7 },
@@ -59,6 +64,58 @@ export const BUILDING_DEFINITIONS: Record<string, BuildingDefinition> = {
 		supplyProvided: 8,
 		requirements: [],
 		color: '#778899',
+	},
+	nexus: {
+		id: 'nexus',
+		name: 'Nexus',
+		faction: 'protoss',
+		cost: { minerals: 400, gas: 0 },
+		buildTime: 60,
+		stats: { health: 1000, armor: 1, sight: 11 },
+		size: { width: 4, height: 3 },
+		produces: ['probe'],
+		supplyProvided: 10,
+		requirements: [],
+		color: '#ddaa44',
+	},
+	gateway: {
+		id: 'gateway',
+		name: 'Gateway',
+		faction: 'protoss',
+		cost: { minerals: 150, gas: 0 },
+		buildTime: 40,
+		stats: { health: 500, armor: 1, sight: 9 },
+		size: { width: 3, height: 3 },
+		produces: ['zealot', 'stalker'],
+		supplyProvided: 0,
+		requirements: ['nexus'],
+		color: '#cc9933',
+	},
+	robotics_facility: {
+		id: 'robotics_facility',
+		name: 'Robotics Facility',
+		faction: 'protoss',
+		cost: { minerals: 200, gas: 100 },
+		buildTime: 50,
+		stats: { health: 450, armor: 1, sight: 9 },
+		size: { width: 3, height: 3 },
+		produces: ['colossus'],
+		supplyProvided: 0,
+		requirements: ['gateway'],
+		color: '#bb8822',
+	},
+	pylon: {
+		id: 'pylon',
+		name: 'Pylon',
+		faction: 'protoss',
+		cost: { minerals: 100, gas: 0 },
+		buildTime: 18,
+		stats: { health: 200, armor: 0, sight: 9 },
+		size: { width: 2, height: 2 },
+		produces: [],
+		supplyProvided: 8,
+		requirements: [],
+		color: '#eebb33',
 	},
 }
 
