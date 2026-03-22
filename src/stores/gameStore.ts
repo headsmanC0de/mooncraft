@@ -24,6 +24,7 @@ import {
 } from '@/lib/ecs'
 import type { GameStatus } from '@/lib/game/GameManager'
 import { calculateSupplyFromEntities } from '@/lib/game/supply'
+import { canBuild } from '@/lib/game/techTree'
 import type { BuildingComponent, EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
@@ -267,6 +268,12 @@ export const useGameStore = create<GameStore>()(
 			const state = get()
 			const player = state.players.get('player1')
 			if (!player) return
+
+			// Check tech tree requirements
+			if (!canBuild(buildingType, 'player1')) {
+				audioEngine.playError()
+				return
+			}
 
 			const def = getBuildingDef(buildingType)
 
