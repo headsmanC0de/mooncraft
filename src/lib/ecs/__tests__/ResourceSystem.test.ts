@@ -16,7 +16,7 @@ describe('ResourceSystem', () => {
 		em = new EntityManager()
 		cm = new ComponentManager(em)
 		factory = new EntityFactory(em, cm)
-		system = new ResourceSystem(em, cm)
+		system = new ResourceSystem(cm)
 	})
 
 	it('should gather resources when worker is at mineral patch', () => {

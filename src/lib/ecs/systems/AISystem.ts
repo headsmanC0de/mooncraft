@@ -5,6 +5,7 @@
 
 import { getBuildingDef } from '@/config/buildings'
 import { getUnitDef } from '@/config/units'
+import { calculateSupplyFromEntities } from '@/lib/game/supply'
 import { useGameStore } from '@/stores/gameStore'
 import type {
 	BuildingComponent,
@@ -85,38 +86,7 @@ export class AISystem extends System {
 	}
 
 	private getSupplyInfo(aiEntities: Entity[]): { used: number; max: number } {
-		let used = 0
-		let max = 0
-
-		for (const entity of aiEntities) {
-			const building = entity.components.get(ComponentType.BUILDING) as
-				| BuildingComponent
-				| undefined
-			if (building && building.buildProgress >= 1) {
-				const def = getBuildingDef(building.buildingType)
-				max += def.supplyProvided
-			} else if (!building) {
-				const movement = entity.components.get(ComponentType.MOVEMENT) as
-					| MovementComponent
-					| undefined
-				if (movement) {
-					const health = entity.components.get(ComponentType.HEALTH) as
-						| { current: number; max: number }
-						| undefined
-					if (health) {
-						if (health.max === 160) {
-							used += 3
-						} else if (health.max === 150) {
-							used += 2
-						} else {
-							used += 1
-						}
-					}
-				}
-			}
-		}
-
-		return { used, max }
+		return calculateSupplyFromEntities(aiEntities, 'player2')
 	}
 
 	private countByType(

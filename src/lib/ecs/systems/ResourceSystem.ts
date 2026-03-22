@@ -12,8 +12,6 @@ import {
 } from '@/types/ecs'
 import type { ComponentManager } from '../ComponentManager'
 import { componentManager as defaultComponentManager } from '../ComponentManager'
-import type { EntityManager } from '../EntityManager'
-import { entityManager as defaultEntityManager } from '../EntityManager'
 import { System } from '../SystemManager'
 
 export type DepositCallback = (playerId: string, amount: number) => void
@@ -24,13 +22,11 @@ export class ResourceSystem extends System {
 		ComponentType.TRANSFORM,
 	] as ComponentType[]
 	readonly priority = 8
-	private entityManager: EntityManager
 	private componentManager: ComponentManager
 	private onDeposit: DepositCallback | null = null
 
-	constructor(entityManager?: EntityManager, componentManager?: ComponentManager) {
+	constructor(componentManager?: ComponentManager) {
 		super()
-		this.entityManager = entityManager ?? defaultEntityManager
 		this.componentManager = componentManager ?? defaultComponentManager
 	}
 

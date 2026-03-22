@@ -21,14 +21,8 @@ import {
 	VisionSystem,
 } from '@/lib/ecs'
 import type { GameStatus } from '@/lib/game/GameManager'
-import type {
-	BuildingComponent,
-	EntityId,
-	GameState,
-	OwnerComponent,
-	PlayerState,
-	Vector3,
-} from '@/types/ecs'
+import { calculateSupplyFromEntities } from '@/lib/game/supply'
+import type { BuildingComponent, EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
 interface GameStore extends GameState {
@@ -269,45 +263,10 @@ export const useGameStore = create<GameStore>()(
 
 			// Check supply
 			const allEntities = entityManager.getAllEntities()
-			let supplyUsed = 0
-			let supplyMax = 0
-
-			for (const entity of allEntities) {
-				const owner = entity.components.get(ComponentType.OWNER) as OwnerComponent | undefined
-				if (!owner || owner.playerId !== 'player1') continue
-
-				const bldg = entity.components.get(ComponentType.BUILDING) as BuildingComponent | undefined
-				if (bldg) {
-					if (bldg.buildProgress >= 1) {
-						const bldgDef = getBuildingDef(bldg.buildingType)
-						supplyMax += bldgDef.supplyProvided
-					}
-				} else {
-					// It's a unit - count its supply cost
-					const movement = entity.components.get(ComponentType.MOVEMENT)
-					if (movement) {
-						// Try to figure out the unit type from render color or other means
-						// For simplicity, each unit with movement costs 1 supply by default
-						// We check known unit types
-						const health = entity.components.get(ComponentType.HEALTH) as
-							| { current: number; max: number }
-							| undefined
-						const _combat = entity.components.get(ComponentType.COMBAT) as
-							| { attackDamage: number }
-							| undefined
-						if (health) {
-							// Match by max health to determine unit type
-							if (health.max === 160) {
-								supplyUsed += 3 // siege_tank
-							} else if (health.max === 150) {
-								supplyUsed += 2 // medivac
-							} else {
-								supplyUsed += 1 // worker or marine
-							}
-						}
-					}
-				}
-			}
+			const { used: supplyUsed, max: supplyMax } = calculateSupplyFromEntities(
+				allEntities,
+				'player1',
+			)
 
 			if (supplyUsed + unitDef.cost.supply > supplyMax) return
 
