@@ -1,7 +1,7 @@
 'use client'
 
 import { useThree } from '@react-three/fiber'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { componentManager, entityManager } from '@/lib/ecs'
 import { useGameStore } from '@/stores/gameStore'
@@ -19,6 +19,7 @@ export function InputHandler() {
 	const mouse = useRef(new THREE.Vector2())
 	const dragStart = useRef<{ x: number; y: number } | null>(null)
 	const groundPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0))
+	const [attackMoveMode, setAttackMoveMode] = useState(false)
 
 	// Helper: get world position from mouse event (raycast to ground plane)
 	const getGroundPosition = useCallback(
@@ -81,6 +82,24 @@ export function InputHandler() {
 				const dragDist = Math.sqrt(dx * dx + dy * dy)
 
 				if (dragDist < 5) {
+					// Attack-move mode: move to position and clear targets for auto-engage
+					if (attackMoveMode) {
+						const worldPos = getGroundPosition(e)
+						if (worldPos) {
+							const store = useGameStore.getState()
+							store.moveSelectedUnits({ x: worldPos.x, y: 0, z: worldPos.z })
+							store.selectedUnits.forEach((unitId) => {
+								if (componentManager.hasComponent(unitId, ComponentType.COMBAT)) {
+									componentManager.updateComponent(unitId, ComponentType.COMBAT, {
+										targetId: null,
+									})
+								}
+							})
+						}
+						setAttackMoveMode(false)
+						return
+					}
+
 					// Single click — select entity or clear
 					const worldPos = getGroundPosition(e)
 					if (!worldPos) return
@@ -208,16 +227,41 @@ export function InputHandler() {
 			store.moveSelectedUnits({ x: worldPos.x, y: 0, z: worldPos.z })
 		}
 
+		const onKeyDown = (e: KeyboardEvent) => {
+			const store = useGameStore.getState()
+			if (store.showPauseMenu || store.gameStatus !== 'playing') return
+
+			switch (e.key.toLowerCase()) {
+				case 'a':
+					setAttackMoveMode(true)
+					break
+				case 's':
+					store.stopSelectedUnits()
+					break
+				case 'h':
+					store.stopSelectedUnits()
+					break
+			}
+		}
+
+		window.addEventListener('keydown', onKeyDown)
 		canvas.addEventListener('mousedown', onMouseDown)
 		canvas.addEventListener('mouseup', onMouseUp)
 		canvas.addEventListener('contextmenu', onContextMenu)
 
 		return () => {
+			window.removeEventListener('keydown', onKeyDown)
 			canvas.removeEventListener('mousedown', onMouseDown)
 			canvas.removeEventListener('mouseup', onMouseUp)
 			canvas.removeEventListener('contextmenu', onContextMenu)
 		}
-	}, [camera, gl, getGroundPosition, findEntityAtPosition])
+	}, [camera, gl, getGroundPosition, findEntityAtPosition, attackMoveMode])
+
+	if (attackMoveMode) {
+		gl.domElement.style.cursor = 'crosshair'
+	} else {
+		gl.domElement.style.cursor = ''
+	}
 
 	return null
 }

@@ -109,6 +109,7 @@ interface GameStore extends GameState {
 	selectUnits: (ids: EntityId[], additive?: boolean) => void
 	clearSelection: () => void
 	moveSelectedUnits: (target: Vector3) => void
+	stopSelectedUnits: () => void
 	setPlacementMode: (mode: string | null) => void
 	placeBuilding: (buildingType: string, position: Vector3) => void
 	trainUnit: (buildingId: EntityId, unitType: string) => void
@@ -291,6 +292,21 @@ export const useGameStore = create<GameStore>()(
 						z: target.z + offset.z,
 					},
 				})
+			})
+		},
+
+		stopSelectedUnits: () => {
+			const { selectedUnits } = get()
+			selectedUnits.forEach((id) => {
+				componentManager.updateComponent(id, ComponentType.MOVEMENT, {
+					targetPosition: null,
+					isMoving: false,
+				})
+				if (componentManager.hasComponent(id, ComponentType.COMBAT)) {
+					componentManager.updateComponent(id, ComponentType.COMBAT, {
+						targetId: null,
+					})
+				}
 			})
 		},
 
