@@ -10,17 +10,15 @@ const keys = new Set<string>()
 
 export function GameCamera() {
 	const { camera } = useThree()
+	const storePos = useGameStore.getState().cameraPosition
 	const target = useRef(
-		new THREE.Vector3(
-			GAME_CONFIG.camera.initialPosition.x,
-			0,
-			GAME_CONFIG.camera.initialPosition.z,
-		),
+		new THREE.Vector3(storePos.x, 0, storePos.z),
 	)
 
 	useEffect(() => {
-		const cam = GAME_CONFIG.camera
-		camera.position.set(cam.initialPosition.x, cam.initialPosition.y, cam.initialPosition.z)
+		const pos = useGameStore.getState().cameraPosition
+		const zoom = useGameStore.getState().cameraZoom
+		camera.position.set(pos.x + zoom * 0.7, zoom, pos.z + zoom * 0.7)
 		camera.lookAt(target.current)
 
 		const onKeyDown = (e: KeyboardEvent) => keys.add(e.key.toLowerCase())

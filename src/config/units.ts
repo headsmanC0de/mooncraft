@@ -41,8 +41,8 @@ export const UNIT_DEFINITIONS: Record<string, UnitDefinition> = {
 		},
 		canGather: true,
 		isFlying: false,
-		modelScale: 1,
-		color: '#88aacc',
+		modelScale: 0.8,
+		color: '#44ddff',
 	},
 	marine: {
 		id: 'marine',

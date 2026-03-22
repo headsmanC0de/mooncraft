@@ -4,6 +4,7 @@
  */
 
 import { getBuildingDef } from '@/config/buildings'
+import { UNIT_DEFINITIONS } from '@/config/units'
 import type {
 	BuildingComponent,
 	Entity,
@@ -12,6 +13,16 @@ import type {
 	OwnerComponent,
 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
+
+/**
+ * Build a lookup from (faction, health.max) → supply cost
+ * so we can determine supply cost from entity components.
+ */
+const supplyLookup = new Map<string, number>()
+for (const def of Object.values(UNIT_DEFINITIONS)) {
+	const key = `${def.faction}:${def.stats.health}`
+	supplyLookup.set(key, def.cost.supply)
+}
 
 export function calculateSupplyFromEntities(
 	entities: Entity[],
@@ -37,13 +48,9 @@ export function calculateSupplyFromEntities(
 			if (movement) {
 				const health = entity.components.get(ComponentType.HEALTH) as HealthComponent | undefined
 				if (health) {
-					if (health.max === 160) {
-						used += 3 // siege_tank
-					} else if (health.max === 150) {
-						used += 2 // medivac
-					} else {
-						used += 1 // worker or marine
-					}
+					const key = `${owner.faction}:${health.max}`
+					const supplyCost = supplyLookup.get(key) ?? 1
+					used += supplyCost
 				}
 			}
 		}
