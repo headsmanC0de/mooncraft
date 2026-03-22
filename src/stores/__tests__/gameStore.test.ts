@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { componentManager, EntityFactory, entityManager } from '@/lib/ecs'
 import { ComponentType } from '@/types/ecs'
-import type { MovementComponent, SelectionComponent } from '@/types/ecs'
+import type { BuildingComponent, MovementComponent, SelectionComponent } from '@/types/ecs'
 
 vi.mock('@/lib/audio', () => ({
 	audioEngine: {
@@ -243,6 +243,148 @@ describe('GameStore', () => {
 		it('should do nothing when recalling empty group', () => {
 			useGameStore.getState().recallControlGroup(5)
 			expect(useGameStore.getState().selectedUnits).toHaveLength(0)
+		})
+	})
+
+	describe('placeBuilding', () => {
+		beforeEach(() => {
+			const players = new Map()
+			players.set('player1', {
+				id: 'player1',
+				name: 'Player 1',
+				teamId: 'team1',
+				faction: 'terran',
+				resources: { minerals: 500, gas: 250, supply: 0, maxSupply: 10 },
+				isAlive: true,
+			})
+			useGameStore.setState({ players, playerFaction: 'terran' })
+		})
+
+		it('should place building and deduct resources', () => {
+			factory.createBuilding('command_center', 'player1', 'team1', { x: 10, y: 0, z: 10 }, true)
+
+			useGameStore.getState().placeBuilding('barracks', { x: 15, y: 0, z: 15 })
+
+			const player = useGameStore.getState().players.get('player1')
+			expect(player!.resources.minerals).toBe(350) // 500 - 150
+		})
+
+		it('should not place building without enough resources', () => {
+			const players = new Map()
+			players.set('player1', {
+				id: 'player1',
+				name: 'Player 1',
+				teamId: 'team1',
+				faction: 'terran',
+				resources: { minerals: 10, gas: 0, supply: 0, maxSupply: 10 },
+				isAlive: true,
+			})
+			useGameStore.setState({ players })
+
+			useGameStore.getState().placeBuilding('barracks', { x: 15, y: 0, z: 15 })
+
+			const player = useGameStore.getState().players.get('player1')
+			expect(player!.resources.minerals).toBe(10)
+		})
+
+		it('should not place building without meeting tech requirements', () => {
+			useGameStore.getState().placeBuilding('barracks', { x: 15, y: 0, z: 15 })
+
+			const player = useGameStore.getState().players.get('player1')
+			expect(player!.resources.minerals).toBe(500) // unchanged
+		})
+
+		it('should deduct gas for buildings that cost gas', () => {
+			factory.createBuilding('command_center', 'player1', 'team1', { x: 10, y: 0, z: 10 }, true)
+			factory.createBuilding('barracks', 'player1', 'team1', { x: 15, y: 0, z: 15 }, true)
+
+			useGameStore.getState().placeBuilding('factory', { x: 20, y: 0, z: 20 })
+
+			const player = useGameStore.getState().players.get('player1')
+			expect(player!.resources.gas).toBe(150) // 250 - 100
+		})
+	})
+
+	describe('trainUnit', () => {
+		let buildingId: string
+
+		beforeEach(() => {
+			const players = new Map()
+			players.set('player1', {
+				id: 'player1',
+				name: 'Player 1',
+				teamId: 'team1',
+				faction: 'terran',
+				resources: { minerals: 500, gas: 250, supply: 4, maxSupply: 50 },
+				isAlive: true,
+			})
+			useGameStore.setState({ players })
+
+			// Command center provides supply so units can be trained
+			factory.createBuilding('command_center', 'player1', 'team1', { x: 0, y: 0, z: 0 }, true)
+			buildingId = factory.createBuilding(
+				'barracks',
+				'player1',
+				'team1',
+				{ x: 10, y: 0, z: 10 },
+				true,
+			)
+		})
+
+		it('should add unit to building production queue', () => {
+			useGameStore.getState().trainUnit(buildingId, 'marine')
+
+			const building = componentManager.getComponent<BuildingComponent>(
+				buildingId,
+				ComponentType.BUILDING,
+			)
+			expect(building!.queue).toHaveLength(1)
+			expect(building!.queue[0].type).toBe('marine')
+		})
+
+		it('should deduct resources', () => {
+			useGameStore.getState().trainUnit(buildingId, 'marine')
+
+			const player = useGameStore.getState().players.get('player1')
+			expect(player!.resources.minerals).toBe(450) // 500 - 50
+		})
+
+		it('should not train without enough minerals', () => {
+			const players = new Map()
+			players.set('player1', {
+				id: 'player1',
+				name: 'Player 1',
+				teamId: 'team1',
+				faction: 'terran',
+				resources: { minerals: 10, gas: 0, supply: 0, maxSupply: 50 },
+				isAlive: true,
+			})
+			useGameStore.setState({ players })
+
+			useGameStore.getState().trainUnit(buildingId, 'marine')
+
+			const building = componentManager.getComponent<BuildingComponent>(
+				buildingId,
+				ComponentType.BUILDING,
+			)
+			expect(building!.queue).toHaveLength(0)
+		})
+
+		it('should not train from incomplete building', () => {
+			const incompleteId = factory.createBuilding(
+				'barracks',
+				'player1',
+				'team1',
+				{ x: 20, y: 0, z: 20 },
+			)
+
+			useGameStore.getState().trainUnit(incompleteId, 'marine')
+
+			const building = componentManager.getComponent<BuildingComponent>(
+				incompleteId,
+				ComponentType.BUILDING,
+			)
+			expect(building!.queue).toHaveLength(0)
 		})
 	})
 })
