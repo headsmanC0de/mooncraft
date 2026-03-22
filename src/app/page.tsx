@@ -1,62 +1,177 @@
+'use client'
+
 import Link from 'next/link'
+import { GAME_CONFIG } from '@/config'
 
 export default function Home() {
 	return (
-		<main className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black flex items-center justify-center">
-			<div className="text-center space-y-8">
-				<div className="space-y-4">
-					<h1 className="text-7xl font-bold bg-gradient-to-r from-blue-400 via-cyan-500 to-purple-500 bg-clip-text text-transparent">
-						MoonCraft
-					</h1>
-					<p className="text-gray-400 text-xl max-w-md mx-auto">
-						Online RTS game inspired by StarCraft & WarCraft
-					</p>
-				</div>
+		<main
+			style={{
+				minHeight: '100vh',
+				background: 'linear-gradient(135deg, #0a0a1a 0%, #0d1117 40%, #0a0a1a 100%)',
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center',
+				fontFamily: 'system-ui, -apple-system, sans-serif',
+				position: 'relative',
+				overflow: 'hidden',
+			}}
+		>
+			{/* Subtle star-field background */}
+			<div
+				style={{
+					position: 'absolute',
+					inset: 0,
+					backgroundImage:
+						'radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.15) 0%, transparent 100%), ' +
+						'radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 100%), ' +
+						'radial-gradient(1px 1px at 50% 40%, rgba(255,255,255,0.12) 0%, transparent 100%), ' +
+						'radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.08) 0%, transparent 100%), ' +
+						'radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.1) 0%, transparent 100%), ' +
+						'radial-gradient(1px 1px at 15% 90%, rgba(255,255,255,0.1) 0%, transparent 100%), ' +
+						'radial-gradient(1px 1px at 80% 85%, rgba(255,255,255,0.08) 0%, transparent 100%)',
+					pointerEvents: 'none',
+				}}
+			/>
 
-				<div className="flex gap-4 justify-center">
+			{/* Vignette overlay */}
+			<div
+				style={{
+					position: 'absolute',
+					inset: 0,
+					background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%)',
+					pointerEvents: 'none',
+				}}
+			/>
+
+			{/* Content */}
+			<div
+				style={{
+					position: 'relative',
+					zIndex: 1,
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					gap: '12px',
+				}}
+			>
+				{/* Title */}
+				<h1
+					style={{
+						fontSize: 'clamp(3rem, 8vw, 5rem)',
+						fontWeight: 800,
+						background: 'linear-gradient(135deg, #60a5fa 0%, #22d3ee 50%, #a78bfa 100%)',
+						WebkitBackgroundClip: 'text',
+						WebkitTextFillColor: 'transparent',
+						backgroundClip: 'text',
+						margin: 0,
+						letterSpacing: '-0.02em',
+						lineHeight: 1.1,
+						textAlign: 'center',
+					}}
+				>
+					{GAME_CONFIG.branding.name}
+				</h1>
+
+				{/* Tagline */}
+				<p
+					style={{
+						fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+						color: '#9ca3af',
+						margin: 0,
+						letterSpacing: '0.05em',
+						textTransform: 'uppercase',
+						textAlign: 'center',
+					}}
+				>
+					{GAME_CONFIG.branding.tagline}
+				</p>
+
+				{/* Buttons */}
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '12px',
+						marginTop: '36px',
+						width: '260px',
+					}}
+				>
 					<Link
 						href="/game"
-						className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-lg rounded-lg shadow-lg shadow-blue-500/25 transition-all hover:scale-105"
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							gap: '10px',
+							padding: '16px 32px',
+							background: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)',
+							color: '#ffffff',
+							fontWeight: 700,
+							fontSize: '1.1rem',
+							borderRadius: '8px',
+							border: '1px solid rgba(96,165,250,0.3)',
+							textDecoration: 'none',
+							letterSpacing: '0.05em',
+							textTransform: 'uppercase',
+							boxShadow: '0 0 24px rgba(37,99,235,0.3), 0 4px 12px rgba(0,0,0,0.4)',
+							transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+							cursor: 'pointer',
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.transform = 'scale(1.04)'
+							e.currentTarget.style.boxShadow =
+								'0 0 32px rgba(37,99,235,0.5), 0 6px 16px rgba(0,0,0,0.4)'
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.transform = 'scale(1)'
+							e.currentTarget.style.boxShadow =
+								'0 0 24px rgba(37,99,235,0.3), 0 4px 12px rgba(0,0,0,0.4)'
+						}}
 					>
-						🎮 Play Game
+						<span style={{ fontSize: '1.2rem' }}>&#9654;</span>
+						New Game
 					</Link>
-					<Link
-						href="/docs"
-						className="px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white font-bold text-lg rounded-lg border border-gray-600 transition-all"
+
+					<button
+						disabled
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							gap: '10px',
+							padding: '16px 32px',
+							background: 'rgba(255,255,255,0.05)',
+							color: '#6b7280',
+							fontWeight: 700,
+							fontSize: '1.1rem',
+							borderRadius: '8px',
+							border: '1px solid rgba(255,255,255,0.08)',
+							letterSpacing: '0.05em',
+							textTransform: 'uppercase',
+							cursor: 'not-allowed',
+							opacity: 0.6,
+						}}
 					>
-						📚 Documentation
-					</Link>
+						<span style={{ fontSize: '1.1rem' }}>&#9881;</span>
+						Settings
+					</button>
 				</div>
 
-				<div className="pt-8 border-t border-white/10 max-w-2xl mx-auto">
-					<h2 className="text-white font-semibold mb-4">Features</h2>
-					<div className="grid grid-cols-3 gap-4 text-sm">
-						<FeatureCard icon="🎯" title="ECS Architecture" desc="Entity Component System" />
-						<FeatureCard icon="🌐" title="Multiplayer" desc="Real-time WebSocket sync" />
-						<FeatureCard icon="🎮" title="RTS Gameplay" desc="Units, buildings, resources" />
-					</div>
-				</div>
-
-				<div className="text-sm text-gray-500 flex gap-4 justify-center">
-					<span>Three.js</span>
-					<span>•</span>
-					<span>React Three Fiber</span>
-					<span>•</span>
-					<span>TypeScript</span>
-					<span>•</span>
-					<span>Zustand</span>
-				</div>
+				{/* Footer */}
+				<p
+					style={{
+						marginTop: '48px',
+						fontSize: '0.8rem',
+						color: '#4b5563',
+						letterSpacing: '0.04em',
+						textAlign: 'center',
+					}}
+				>
+					Built with Three.js &bull; React &bull; TypeScript
+				</p>
 			</div>
 		</main>
-	)
-}
-
-function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
-	return (
-		<div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-			<div className="text-2xl mb-2">{icon}</div>
-			<div className="text-white font-bold text-sm">{title}</div>
-			<div className="text-gray-400 text-xs">{desc}</div>
-		</div>
 	)
 }
