@@ -107,6 +107,8 @@ export function Minimap() {
 	return (
 		<canvas
 			ref={canvasRef}
+			aria-label="Game minimap"
+			role="img"
 			width={CANVAS_SIZE}
 			height={CANVAS_SIZE}
 			onClick={handleClick}

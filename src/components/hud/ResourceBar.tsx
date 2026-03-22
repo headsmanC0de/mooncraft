@@ -33,16 +33,16 @@ export function ResourceBar() {
 				userSelect: 'none',
 			}}
 		>
-			<span>
+			<span aria-label={`Minerals: ${Math.floor(minerals)}`}>
 				{'\u{1F48E}'} {Math.floor(minerals)}
 			</span>
-			<span>
+			<span aria-label={`Gas: ${Math.floor(gas)}`}>
 				{'\u{26FD}'} {Math.floor(gas)}
 			</span>
-			<span>
+			<span aria-label={`Supply: ${supply} of ${maxSupply}`}>
 				{'\u{1F3E0}'} {supply}/{maxSupply}
 			</span>
-			<span>
+			<span aria-label={`Game time: ${timeStr}`}>
 				{'\u{23F1}'} {timeStr}
 			</span>
 		</div>

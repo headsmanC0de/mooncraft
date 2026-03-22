@@ -108,7 +108,7 @@ export default function Home() {
 				<p
 					style={{
 						fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
-						color: '#9ca3af',
+						color: '#b8bfc8',
 						margin: 0,
 						letterSpacing: '0.05em',
 						textTransform: 'uppercase',
@@ -140,7 +140,7 @@ export default function Home() {
 						Choose your faction:
 					</p>
 
-					<div style={{ display: 'flex', gap: '16px' }}>
+					<div style={{ display: 'flex', gap: '16px' }} role="radiogroup" aria-label="Choose faction">
 						{(Object.keys(factionInfo) as Faction[]).map((faction) => {
 							const info = factionInfo[faction]
 							const isSelected = selectedFaction === faction
@@ -148,6 +148,7 @@ export default function Home() {
 								<button
 									key={faction}
 									type="button"
+									aria-pressed={isSelected}
 									onClick={() => setSelectedFaction(faction)}
 									style={{
 										display: 'flex',
@@ -189,7 +190,7 @@ export default function Home() {
 									</span>
 									<span
 										style={{
-											color: '#9ca3af',
+											color: '#d1d5db',
 											fontSize: '0.8rem',
 										}}
 									>
@@ -222,7 +223,7 @@ export default function Home() {
 					>
 						Difficulty:
 					</p>
-					<div style={{ display: 'flex', gap: '8px' }}>
+					<div style={{ display: 'flex', gap: '8px' }} role="radiogroup" aria-label="Choose difficulty">
 						{(['easy', 'normal', 'hard'] as Difficulty[]).map((diff) => {
 							const isSelected = selectedDifficulty === diff
 							const label = GAME_CONFIG.aiDifficulty[diff].label
@@ -230,6 +231,7 @@ export default function Home() {
 								<button
 									key={diff}
 									type="button"
+									aria-pressed={isSelected}
 									onClick={() => setSelectedDifficulty(diff)}
 									style={{
 										padding: '8px 18px',
@@ -277,13 +279,14 @@ export default function Home() {
 					>
 						Map:
 					</p>
-					<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+					<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }} role="radiogroup" aria-label="Choose map">
 						{[{ id: 'random', name: 'Random' }, ...MAP_DEFINITIONS].map((map) => {
 							const isSelected = selectedMap === map.id
 							return (
 								<button
 									key={map.id}
 									type="button"
+									aria-pressed={isSelected}
 									onClick={() => setSelectedMap(map.id)}
 									style={{
 										padding: '6px 14px',
@@ -310,7 +313,8 @@ export default function Home() {
 				</div>
 
 				{/* Buttons */}
-				<div
+				<nav
+					aria-label="Main menu"
 					style={{
 						display: 'flex',
 						flexDirection: 'column',
@@ -358,6 +362,8 @@ export default function Home() {
 					<button
 						type="button"
 						disabled
+						title="Coming soon"
+						aria-description="Not yet available"
 						style={{
 							display: 'flex',
 							alignItems: 'center',
@@ -379,14 +385,14 @@ export default function Home() {
 						<span style={{ fontSize: '1.1rem' }}>&#9881;</span>
 						Settings
 					</button>
-				</div>
+				</nav>
 
 				{/* Footer */}
 				<p
 					style={{
 						marginTop: '48px',
 						fontSize: '0.8rem',
-						color: '#4b5563',
+						color: '#9ca3af',
 						letterSpacing: '0.04em',
 						textAlign: 'center',
 					}}
