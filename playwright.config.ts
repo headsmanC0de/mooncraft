@@ -9,13 +9,13 @@ export default defineConfig({
 	reporter: 'html',
 	timeout: 30000,
 	use: {
-		baseURL: 'http://localhost:3000',
+		baseURL: 'http://localhost:4444',
 		trace: 'on-first-retry',
 		screenshot: 'only-on-failure',
 	},
 	webServer: {
-		command: 'bun run dev --turbopack --port 3000',
-		port: 3000,
+		command: 'bun run dev --turbopack --port 4444',
+		port: 4444,
 		timeout: 30000,
 		reuseExistingServer: !process.env.CI,
 	},
