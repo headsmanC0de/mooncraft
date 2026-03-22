@@ -15,10 +15,10 @@ export function GameCanvas() {
 			gl={{ antialias: true, alpha: false }}
 			style={{ width: '100vw', height: '100vh', background: '#121218' }}
 		>
-			<ambientLight intensity={0.8} color="#ffeedd" />
+			<ambientLight intensity={1.2} color="#ffeedd" />
 			<directionalLight
 				position={[50, 80, 50]}
-				intensity={1.8}
+				intensity={2.5}
 				color="#fff8ee"
 				castShadow
 				shadow-mapSize-width={2048}
@@ -30,7 +30,7 @@ export function GameCanvas() {
 				shadow-camera-bottom={-100}
 			/>
 			<hemisphereLight args={['#d4f0ff', '#556655', 0.8]} />
-			<fog attach="fog" args={['#121218', 120, 250]} />
+			<fog attach="fog" args={['#121218', 200, 400]} />
 			<GameLoop />
 			<InputHandler />
 			<GameCamera />

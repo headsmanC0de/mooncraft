@@ -1,7 +1,8 @@
 'use client'
 
 import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
+import * as THREE from 'three'
 import type { Group } from 'three'
 import type {
 	HealthComponent,
@@ -9,6 +10,7 @@ import type {
 	SelectionComponent,
 	TransformComponent,
 } from '@/types/ecs'
+import { generateUnitSprite } from '@/lib/sprites/SpriteGenerator'
 
 interface UnitMeshProps {
 	transform: TransformComponent
@@ -23,37 +25,32 @@ function getHealthColor(percent: number): string {
 	return '#ff0000'
 }
 
-function getUnitGeometry(scale: number) {
-	if (scale <= 0.85) {
-		// Worker — small sphere
-		return <sphereGeometry args={[0.6, 8, 6]} />
-	} else if (scale >= 1.45) {
-		// Colossus — tall thin box with legs
-		return <boxGeometry args={[0.6, 2.0, 0.6]} />
-	} else if (scale >= 1.35) {
-		// Flying/heavy — flat disc
-		return <cylinderGeometry args={[0.8, 0.65, 0.5, 8]} />
-	} else if (scale >= 1.15) {
-		// Vehicle — box
-		return <boxGeometry args={[1.0, 0.6, 1.2]} />
-	} else if (scale >= 1.05) {
-		// Stalker — tall capsule
-		return <capsuleGeometry args={[0.4, 1.0, 4, 8]} />
-	} else {
-		// Standard infantry — capsule (marine/zealot)
-		return <capsuleGeometry args={[0.5, 0.8, 4, 8]} />
-	}
-}
-
-function isInfantryOrAbove(scale: number): boolean {
-	// Show weapon detail for combat-sized units (not workers)
-	return scale > 0.85
+function getUnitType(scale: number): string {
+	if (scale <= 0.85) return 'worker'
+	if (scale <= 1.04) return 'marine'
+	if (scale <= 1.14) return 'stalker'
+	if (scale <= 1.34) return 'siege_tank'
+	if (scale <= 1.44) return 'medivac'
+	return 'colossus'
 }
 
 export function UnitMesh({ transform, health, selection, render }: UnitMeshProps) {
 	const healthBarRef = useRef<Group>(null)
 	const healthPercent = health.max > 0 ? health.current / health.max : 0
 	const modelScale = transform.scale.x
+
+	const unitType = getUnitType(modelScale)
+	const teamColor = render.color ?? '#5577cc'
+
+	const texture = useMemo(() => {
+		if (typeof document === 'undefined') return null
+		const canvas = generateUnitSprite(unitType, teamColor)
+		const tex = new THREE.CanvasTexture(canvas)
+		tex.needsUpdate = true
+		return tex
+	}, [unitType, teamColor])
+
+	const spriteScale = modelScale * 2
 
 	useFrame(({ camera }) => {
 		if (healthBarRef.current) {
@@ -62,44 +59,24 @@ export function UnitMesh({ transform, health, selection, render }: UnitMeshProps
 	})
 
 	return (
-		<group
-			position={[transform.position.x, transform.position.y + 0.8, transform.position.z]}
-			rotation={[0, transform.rotation, 0]}
-		>
-			{/* Shadow disc */}
-			<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.78, 0]}>
-				<circleGeometry args={[0.8 * modelScale, 16]} />
-				<meshBasicMaterial color="#000000" transparent opacity={0.3} />
-			</mesh>
-
-			{/* Unit body — shape varies by type */}
-			<mesh castShadow scale={[modelScale, modelScale, modelScale]}>
-				{getUnitGeometry(modelScale)}
-				<meshStandardMaterial color={render.color ?? '#4488ff'} />
-			</mesh>
-
-			{/* Weapon detail for combat units */}
-			{isInfantryOrAbove(modelScale) && (
-				<mesh
-					castShadow
-					position={[0, 0, 0.4 * modelScale]}
-					scale={[modelScale, modelScale, modelScale]}
-				>
-					<boxGeometry args={[0.15, 0.15, 0.5]} />
-					<meshStandardMaterial color={render.color ?? '#4488ff'} />
-				</mesh>
+		<group position={[transform.position.x, transform.position.y + 1, transform.position.z]}>
+			{/* Unit sprite */}
+			{texture && (
+				<sprite scale={[spriteScale, spriteScale, 1]}>
+					<spriteMaterial map={texture} transparent depthWrite={false} />
+				</sprite>
 			)}
 
 			{/* Selection ring */}
 			{selection.isSelected && (
-				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.78, 0]}>
+				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.9, 0]}>
 					<ringGeometry args={[0.8 * modelScale, 0.95 * modelScale, 32]} />
 					<meshBasicMaterial color="#00ff88" transparent opacity={0.8} />
 				</mesh>
 			)}
 
 			{/* Health bar (billboard) */}
-			<group ref={healthBarRef} position={[0, 2.0 * modelScale, 0]}>
+			<group ref={healthBarRef} position={[0, spriteScale / 2 + 0.3, 0]}>
 				{/* Background */}
 				<mesh position={[0, 0, -0.001]}>
 					<planeGeometry args={[1.6, 0.15]} />

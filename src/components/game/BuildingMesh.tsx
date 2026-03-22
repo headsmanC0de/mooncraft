@@ -1,7 +1,8 @@
 'use client'
 
 import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
+import * as THREE from 'three'
 import type { Group } from 'three'
 import type {
 	BuildingComponent,
@@ -10,6 +11,7 @@ import type {
 	SelectionComponent,
 	TransformComponent,
 } from '@/types/ecs'
+import { generateBuildingSprite } from '@/lib/sprites/SpriteGenerator'
 
 interface BuildingMeshProps {
 	transform: TransformComponent
@@ -38,9 +40,21 @@ export function BuildingMesh({
 	const isBuilding = progress < 1
 
 	const scaleX = transform.scale.x
-	const scaleY = transform.scale.y * progress
 	const scaleZ = transform.scale.z
 	const ringSize = Math.max(scaleX, scaleZ) * 0.7
+
+	const teamColor = render.color ?? '#888888'
+	const buildingType = building.buildingType ?? 'building'
+
+	const texture = useMemo(() => {
+		if (typeof document === 'undefined') return null
+		const canvas = generateBuildingSprite(buildingType, teamColor)
+		const tex = new THREE.CanvasTexture(canvas)
+		tex.needsUpdate = true
+		return tex
+	}, [buildingType, teamColor])
+
+	const spriteScale = Math.max(scaleX, scaleZ) * 1.5
 
 	useFrame(({ camera }) => {
 		if (healthBarRef.current) {
@@ -50,22 +64,16 @@ export function BuildingMesh({
 
 	return (
 		<group position={[transform.position.x, transform.position.y, transform.position.z]}>
-			{/* Building body */}
-			<mesh castShadow position={[0, scaleY / 2, 0]}>
-				<boxGeometry args={[scaleX, scaleY, scaleZ]} />
-				<meshStandardMaterial
-					color={render.color ?? '#888888'}
-					transparent={isBuilding}
-					opacity={isBuilding ? 0.5 + progress * 0.5 : 1}
-				/>
-			</mesh>
-
-			{/* Roof pyramid (shown when complete) */}
-			{!isBuilding && (
-				<mesh castShadow position={[0, transform.scale.y + 0.25, 0]}>
-					<coneGeometry args={[Math.min(scaleX, scaleZ) * 0.6, 0.5, 4]} />
-					<meshStandardMaterial color={render.color ?? '#888888'} metalness={0.3} roughness={0.7} />
-				</mesh>
+			{/* Building sprite */}
+			{texture && (
+				<sprite position={[0, spriteScale / 2, 0]} scale={[spriteScale, spriteScale * progress, 1]}>
+					<spriteMaterial
+						map={texture}
+						transparent
+						depthWrite={false}
+						opacity={isBuilding ? 0.5 + progress * 0.5 : 1}
+					/>
+				</sprite>
 			)}
 
 			{/* Selection ring */}
@@ -78,7 +86,7 @@ export function BuildingMesh({
 
 			{/* Build progress bar */}
 			{isBuilding && (
-				<group ref={healthBarRef} position={[0, transform.scale.y + 0.5, 0]}>
+				<group ref={healthBarRef} position={[0, spriteScale + 0.5, 0]}>
 					<mesh position={[0, 0, -0.001]}>
 						<planeGeometry args={[1.2, 0.1]} />
 						<meshBasicMaterial color="#333333" transparent opacity={0.6} />
@@ -92,7 +100,7 @@ export function BuildingMesh({
 
 			{/* Health bar (shown when complete) */}
 			{!isBuilding && (
-				<group ref={healthBarRef} position={[0, transform.scale.y + 0.8, 0]}>
+				<group ref={healthBarRef} position={[0, spriteScale + 0.5, 0]}>
 					<mesh position={[0, 0, -0.001]}>
 						<planeGeometry args={[1.2, 0.1]} />
 						<meshBasicMaterial color="#333333" transparent opacity={0.6} />
