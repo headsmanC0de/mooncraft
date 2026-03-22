@@ -15,6 +15,7 @@ import {
 	ResourceSystem,
 	systemManager,
 } from '@/lib/ecs'
+import { getBuildingDef } from '@/config/buildings'
 import type { EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
@@ -36,6 +37,7 @@ interface GameStore extends GameState {
 	clearSelection: () => void
 	moveSelectedUnits: (target: Vector3) => void
 	setPlacementMode: (mode: string | null) => void
+	placeBuilding: (buildingType: string, position: Vector3) => void
 	setCameraPosition: (pos: { x: number; y: number; z: number }) => void
 	setCameraZoom: (zoom: number) => void
 	pause: () => void
@@ -177,6 +179,40 @@ export const useGameStore = create<GameStore>()(
 		},
 
 		setPlacementMode: (mode) => set({ placementMode: mode }),
+
+		placeBuilding: (buildingType, position) => {
+			const state = get()
+			const player = state.players.get('player1')
+			if (!player) return
+
+			const def = getBuildingDef(buildingType)
+
+			// Check resources
+			if (
+				player.resources.minerals < def.cost.minerals ||
+				player.resources.gas < def.cost.gas
+			) {
+				return // Not enough resources
+			}
+
+			// Deduct resources
+			const updatedPlayers = new Map(state.players)
+			const updatedPlayer = {
+				...player,
+				resources: {
+					...player.resources,
+					minerals: player.resources.minerals - def.cost.minerals,
+					gas: player.resources.gas - def.cost.gas,
+				},
+			}
+			updatedPlayers.set('player1', updatedPlayer)
+
+			// Create building entity
+			const factory = new EntityFactory(entityManager, componentManager)
+			factory.createBuilding(buildingType, 'player1', 'team1', position)
+
+			set({ players: updatedPlayers, placementMode: null })
+		},
 
 		setCameraPosition: (pos) => set({ cameraPosition: pos }),
 

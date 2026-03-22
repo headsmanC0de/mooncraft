@@ -6,6 +6,7 @@ import { GameCamera } from './GameCamera'
 import { EntityRenderer } from './EntityRenderer'
 import { GameLoop } from './GameLoop'
 import { InputHandler } from './InputHandler'
+import { BuildingPlacer } from './BuildingPlacer'
 
 export function GameCanvas() {
 	return (
@@ -34,6 +35,7 @@ export function GameCanvas() {
 			<GameCamera />
 			<Terrain />
 			<EntityRenderer />
+			<BuildingPlacer />
 		</Canvas>
 	)
 }
