@@ -15,6 +15,16 @@ export function GameLoop() {
 		}
 	}, [])
 
+	useEffect(() => {
+		const resumeAudio = () => {
+			import('@/lib/audio').then((m) => m.audioEngine.playClick())
+			document.removeEventListener('click', resumeAudio)
+			document.removeEventListener('keydown', resumeAudio)
+		}
+		document.addEventListener('click', resumeAudio, { once: true })
+		document.addEventListener('keydown', resumeAudio, { once: true })
+	}, [])
+
 	useFrame((_, delta) => {
 		const state = useGameStore.getState()
 		if (state.gameStatus !== 'playing') return

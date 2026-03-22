@@ -7,6 +7,7 @@ import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { getBuildingDef } from '@/config/buildings'
 import { getUnitDef } from '@/config/units'
+import { audioEngine } from '@/lib/audio'
 import {
 	AISystem,
 	BuildingSystem,
@@ -167,6 +168,10 @@ export const useGameStore = create<GameStore>()(
 					componentManager.updateComponent(id, ComponentType.SELECTION, { isSelected: true })
 				})
 
+				if (ids.length > 0) {
+					audioEngine.playSelect()
+				}
+
 				return {
 					selectedUnits: additive ? [...new Set([...state.selectedUnits, ...ids])] : ids,
 				}
@@ -182,6 +187,9 @@ export const useGameStore = create<GameStore>()(
 
 		moveSelectedUnits: (target) => {
 			const { selectedUnits } = get()
+			if (selectedUnits.length > 0) {
+				audioEngine.playMove()
+			}
 
 			const offsets = [
 				{ x: 0, z: 0 },
@@ -219,6 +227,7 @@ export const useGameStore = create<GameStore>()(
 
 			// Check resources
 			if (player.resources.minerals < def.cost.minerals || player.resources.gas < def.cost.gas) {
+				audioEngine.playError()
 				return // Not enough resources
 			}
 
@@ -238,6 +247,7 @@ export const useGameStore = create<GameStore>()(
 			const factory = new EntityFactory(entityManager, componentManager)
 			factory.createBuilding(buildingType, 'player1', 'team1', position)
 
+			audioEngine.playBuild()
 			set({ players: updatedPlayers, placementMode: null })
 		},
 
@@ -258,6 +268,7 @@ export const useGameStore = create<GameStore>()(
 				player.resources.minerals < unitDef.cost.minerals ||
 				player.resources.gas < unitDef.cost.gas
 			) {
+				audioEngine.playError()
 				return
 			}
 
@@ -268,7 +279,10 @@ export const useGameStore = create<GameStore>()(
 				'player1',
 			)
 
-			if (supplyUsed + unitDef.cost.supply > supplyMax) return
+			if (supplyUsed + unitDef.cost.supply > supplyMax) {
+				audioEngine.playError()
+				return
+			}
 
 			// Deduct resources
 			const updatedPlayers = new Map(state.players)
@@ -288,6 +302,7 @@ export const useGameStore = create<GameStore>()(
 				duration: unitDef.buildTime,
 			})
 
+			audioEngine.playTrain()
 			set({ players: updatedPlayers })
 		},
 
