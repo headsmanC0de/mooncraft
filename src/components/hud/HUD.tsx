@@ -19,7 +19,8 @@ export function HUD() {
 	}, [])
 
 	return (
-		<div
+		<section
+			aria-label="Game HUD"
 			style={{
 				position: 'fixed',
 				inset: 0,
@@ -30,7 +31,9 @@ export function HUD() {
 				justifyContent: 'space-between',
 			}}
 		>
-			<ResourceBar />
+			<div role="status" aria-live="polite">
+				<ResourceBar />
+			</div>
 			<div
 				style={{
 					display: 'flex',
@@ -40,10 +43,12 @@ export function HUD() {
 				}}
 			>
 				<SelectionPanel />
-				<Minimap />
+				<aside aria-label="Minimap">
+					<Minimap />
+				</aside>
 				<CommandPanel />
 			</div>
 			{gameStatus !== 'playing' && <GameOverScreen status={gameStatus} />}
-		</div>
+		</section>
 	)
 }

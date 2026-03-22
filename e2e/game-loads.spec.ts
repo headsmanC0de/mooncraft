@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Game Page', () => {
 	test('should load game page with 3D canvas', async ({ page }) => {
@@ -30,10 +30,7 @@ test.describe('Game Page', () => {
 
 		// Filter out known acceptable warnings (WebGL, Three.js deprecation notices)
 		const realErrors = errors.filter(
-			(e) =>
-				!e.includes('THREE.') &&
-				!e.includes('WebGL') &&
-				!e.includes('deprecated'),
+			(e) => !e.includes('THREE.') && !e.includes('WebGL') && !e.includes('deprecated'),
 		)
 
 		expect(realErrors).toHaveLength(0)

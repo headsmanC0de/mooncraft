@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Game Gameplay', () => {
 	test.beforeEach(async ({ page }) => {
@@ -37,11 +37,7 @@ test.describe('Game Gameplay', () => {
 		page.on('console', (msg) => {
 			if (msg.type() === 'error') {
 				const text = msg.text()
-				if (
-					!text.includes('THREE.') &&
-					!text.includes('WebGL') &&
-					!text.includes('deprecated')
-				) {
+				if (!text.includes('THREE.') && !text.includes('WebGL') && !text.includes('deprecated')) {
 					errors.push(text)
 				}
 			}

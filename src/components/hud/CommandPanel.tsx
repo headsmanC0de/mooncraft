@@ -29,12 +29,21 @@ const buttonHoverStyle: React.CSSProperties = {
 	background: 'rgba(120, 120, 120, 0.8)',
 }
 
-function CommandButton({ label, onClick }: { label: string; onClick?: () => void }) {
+function CommandButton({
+	label,
+	ariaLabel,
+	onClick,
+}: {
+	label: string
+	ariaLabel?: string
+	onClick?: () => void
+}) {
 	const [hovered, setHovered] = useState(false)
 
 	return (
 		<button
 			type="button"
+			aria-label={ariaLabel}
 			style={hovered ? buttonHoverStyle : buttonStyle}
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
@@ -95,6 +104,8 @@ export function CommandPanel() {
 				}}
 			>
 				<div
+					role="toolbar"
+					aria-label="Train units"
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(3, 40px)',
@@ -103,10 +114,15 @@ export function CommandPanel() {
 				>
 					{produces.map((unitType) => {
 						const unitDef = UNIT_DEFINITIONS[unitType]
+						const cost = unitDef?.cost
+						const costStr = cost
+							? `${cost.minerals} minerals${cost.gas ? `, ${cost.gas} gas` : ''}`
+							: ''
 						return (
 							<CommandButton
 								key={unitType}
 								label={`Train\n${unitDef?.name ?? unitType}`}
+								ariaLabel={`Train ${unitDef?.name ?? unitType} - ${costStr}`}
 								onClick={() => handleTrainClick(firstId, unitType)}
 							/>
 						)
@@ -133,16 +149,34 @@ export function CommandPanel() {
 					}}
 				>
 					<div
+						role="toolbar"
+						aria-label="Build structures"
 						style={{
 							display: 'grid',
 							gridTemplateColumns: 'repeat(3, 40px)',
 							gap: 4,
 						}}
 					>
-						<CommandButton label="Supply Depot" onClick={() => handleBuildClick('supply_depot')} />
-						<CommandButton label="Barracks" onClick={() => handleBuildClick('barracks')} />
-						<CommandButton label="Factory" onClick={() => handleBuildClick('factory')} />
-						<CommandButton label="Back" onClick={() => setShowBuildMenu(false)} />
+						<CommandButton
+							label="Supply Depot"
+							ariaLabel="Build Supply Depot - 100 minerals"
+							onClick={() => handleBuildClick('supply_depot')}
+						/>
+						<CommandButton
+							label="Barracks"
+							ariaLabel="Build Barracks - 150 minerals"
+							onClick={() => handleBuildClick('barracks')}
+						/>
+						<CommandButton
+							label="Factory"
+							ariaLabel="Build Factory - 150 minerals, 100 gas"
+							onClick={() => handleBuildClick('factory')}
+						/>
+						<CommandButton
+							label="Back"
+							ariaLabel="Back to commands"
+							onClick={() => setShowBuildMenu(false)}
+						/>
 					</div>
 				</div>
 			)
@@ -162,17 +196,23 @@ export function CommandPanel() {
 				}}
 			>
 				<div
+					role="toolbar"
+					aria-label="Game commands"
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(3, 40px)',
 						gap: 4,
 					}}
 				>
-					<CommandButton label="Move" />
-					<CommandButton label="Stop" />
-					<CommandButton label="Attack" />
-					<CommandButton label="Hold" />
-					<CommandButton label="Build (B)" onClick={() => setShowBuildMenu(true)} />
+					<CommandButton label="Move" ariaLabel="Move units" />
+					<CommandButton label="Stop" ariaLabel="Stop units" />
+					<CommandButton label="Attack" ariaLabel="Attack" />
+					<CommandButton label="Hold" ariaLabel="Hold position" />
+					<CommandButton
+						label="Build (B)"
+						ariaLabel="Open build menu"
+						onClick={() => setShowBuildMenu(true)}
+					/>
 				</div>
 			</div>
 		)
@@ -193,16 +233,18 @@ export function CommandPanel() {
 			}}
 		>
 			<div
+				role="toolbar"
+				aria-label="Game commands"
 				style={{
 					display: 'grid',
 					gridTemplateColumns: 'repeat(3, 40px)',
 					gap: 4,
 				}}
 			>
-				<CommandButton label="Move" />
-				<CommandButton label="Stop" />
-				<CommandButton label="Attack" />
-				<CommandButton label="Hold" />
+				<CommandButton label="Move" ariaLabel="Move units" />
+				<CommandButton label="Stop" ariaLabel="Stop units" />
+				<CommandButton label="Attack" ariaLabel="Attack" />
+				<CommandButton label="Hold" ariaLabel="Hold position" />
 			</div>
 		</div>
 	)

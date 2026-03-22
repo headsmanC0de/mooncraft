@@ -11,6 +11,8 @@ export function GameOverScreen({ status }: GameOverScreenProps) {
 
 	return (
 		<div
+			role="alertdialog"
+			aria-labelledby="game-over-heading"
 			style={{
 				position: 'fixed',
 				inset: 0,
@@ -24,6 +26,7 @@ export function GameOverScreen({ status }: GameOverScreenProps) {
 			}}
 		>
 			<h1
+				id="game-over-heading"
 				style={{
 					fontSize: '6rem',
 					fontWeight: 'bold',
@@ -38,6 +41,7 @@ export function GameOverScreen({ status }: GameOverScreenProps) {
 			</h1>
 			<button
 				type="button"
+				aria-label="Play again"
 				onClick={() => window.location.reload()}
 				style={{
 					padding: '16px 48px',

@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { ComponentType } from '@/types/ecs'
 import { ComponentManager } from '@/lib/ecs/ComponentManager'
 import { EntityFactory } from '@/lib/ecs/EntityFactory'
 import { entityManager } from '@/lib/ecs/EntityManager'
+import { ComponentType } from '@/types/ecs'
 import { checkGameStatus, resetGameStatus } from '../GameManager'
 
 describe('checkGameStatus', () => {

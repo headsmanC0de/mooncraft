@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Game Interactions', () => {
 	test.beforeEach(async ({ page }) => {
@@ -7,9 +7,7 @@ test.describe('Game Interactions', () => {
 		await page.waitForTimeout(4000)
 	})
 
-	test('should select unit on click and show selection panel', async ({
-		page,
-	}) => {
+	test('should select unit on click and show selection panel', async ({ page }) => {
 		// Click near center of canvas where entities should be
 		const canvas = page.locator('canvas').first()
 		await canvas.click({ position: { x: 640, y: 360 } })
@@ -21,9 +19,7 @@ test.describe('Game Interactions', () => {
 		await expect(page.getByText('500').first()).toBeVisible()
 	})
 
-	test('should clear selection on clicking empty ground', async ({
-		page,
-	}) => {
+	test('should clear selection on clicking empty ground', async ({ page }) => {
 		const canvas = page.locator('canvas').first()
 
 		// Click on the edge of the map (likely empty)
@@ -34,9 +30,7 @@ test.describe('Game Interactions', () => {
 		await expect(canvas).toBeVisible()
 	})
 
-	test('should right-click without crash (move command)', async ({
-		page,
-	}) => {
+	test('should right-click without crash (move command)', async ({ page }) => {
 		const canvas = page.locator('canvas').first()
 
 		// Right-click on canvas

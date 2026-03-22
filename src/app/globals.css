@@ -34,3 +34,9 @@ body {
 ::-webkit-scrollbar-thumb:hover {
 	background: #4a4a5f;
 }
+
+/* Accessibility: keyboard focus styles for HUD buttons */
+button:focus-visible {
+	outline: 2px solid #00ff88;
+	outline-offset: 2px;
+}
