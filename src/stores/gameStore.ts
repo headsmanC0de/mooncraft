@@ -14,6 +14,7 @@ import {
 	AISystem,
 	BuildingSystem,
 	CombatSystem,
+	DeathSystem,
 	componentManager,
 	EntityFactory,
 	entityManager,
@@ -165,6 +166,7 @@ export const useGameStore = create<GameStore>()(
 			systemManager.registerSystem(resourceSystem)
 			systemManager.registerSystem(new AISystem(undefined, undefined, get().aiDifficulty))
 			systemManager.registerSystem(new VisionSystem())
+			systemManager.registerSystem(new DeathSystem())
 
 			// Determine factions based on player selection
 			const playerFaction = get().playerFaction
