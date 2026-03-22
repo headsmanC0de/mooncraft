@@ -2,7 +2,9 @@
 
 import { useCallback, useState } from 'react'
 import { BUILDING_DEFINITIONS, UNIT_DEFINITIONS } from '@/config'
+import { getBuildingDef } from '@/config/buildings'
 import { componentManager, entityManager } from '@/lib/ecs'
+import { canBuild } from '@/lib/game/techTree'
 import { useGameStore } from '@/stores/gameStore'
 import type { BuildingComponent } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
@@ -29,25 +31,39 @@ const buttonHoverStyle: React.CSSProperties = {
 	background: 'rgba(120, 120, 120, 0.8)',
 }
 
+const disabledButtonStyle: React.CSSProperties = {
+	...buttonStyle,
+	opacity: 0.3,
+	cursor: 'not-allowed',
+}
+
 function CommandButton({
 	label,
 	ariaLabel,
 	onClick,
+	disabled,
+	tooltip,
 }: {
 	label: string
 	ariaLabel?: string
 	onClick?: () => void
+	disabled?: boolean
+	tooltip?: string
 }) {
 	const [hovered, setHovered] = useState(false)
+
+	const style = disabled ? disabledButtonStyle : hovered ? buttonHoverStyle : buttonStyle
 
 	return (
 		<button
 			type="button"
 			aria-label={ariaLabel}
-			style={hovered ? buttonHoverStyle : buttonStyle}
+			title={tooltip}
+			style={style}
+			disabled={disabled}
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
-			onClick={onClick}
+			onClick={disabled ? undefined : onClick}
 		>
 			{label}
 		</button>
@@ -157,21 +173,22 @@ export function CommandPanel() {
 							gap: 4,
 						}}
 					>
-						<CommandButton
-							label="Supply Depot"
-							ariaLabel="Build Supply Depot - 100 minerals"
-							onClick={() => handleBuildClick('supply_depot')}
-						/>
-						<CommandButton
-							label="Barracks"
-							ariaLabel="Build Barracks - 150 minerals"
-							onClick={() => handleBuildClick('barracks')}
-						/>
-						<CommandButton
-							label="Factory"
-							ariaLabel="Build Factory - 150 minerals, 100 gas"
-							onClick={() => handleBuildClick('factory')}
-						/>
+						{(['supply_depot', 'barracks', 'factory'] as const).map((type) => {
+							const def = getBuildingDef(type)
+							const available = canBuild(type, 'player1')
+							const requirementNames = def.requirements.map((r) => getBuildingDef(r).name)
+							const costStr = `${def.cost.minerals} minerals${def.cost.gas ? `, ${def.cost.gas} gas` : ''}`
+							return (
+								<CommandButton
+									key={type}
+									label={def.name}
+									ariaLabel={`Build ${def.name} - ${costStr}`}
+									onClick={() => handleBuildClick(type)}
+									disabled={!available}
+									tooltip={available ? undefined : `Requires: ${requirementNames.join(', ')}`}
+								/>
+							)
+						})}
 						<CommandButton
 							label="Back"
 							ariaLabel="Back to commands"

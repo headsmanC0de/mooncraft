@@ -117,6 +117,32 @@ export const BUILDING_DEFINITIONS: Record<string, BuildingDefinition> = {
 		requirements: [],
 		color: '#eebb33',
 	},
+	refinery: {
+		id: 'refinery',
+		name: 'Refinery',
+		faction: 'terran',
+		cost: { minerals: 75, gas: 0 },
+		buildTime: 25,
+		stats: { health: 500, armor: 0, sight: 7 },
+		size: { width: 3, height: 3 },
+		produces: [],
+		supplyProvided: 0,
+		requirements: [],
+		color: '#55aa55',
+	},
+	assimilator: {
+		id: 'assimilator',
+		name: 'Assimilator',
+		faction: 'protoss',
+		cost: { minerals: 75, gas: 0 },
+		buildTime: 25,
+		stats: { health: 300, armor: 1, sight: 7 },
+		size: { width: 3, height: 3 },
+		produces: [],
+		supplyProvided: 0,
+		requirements: [],
+		color: '#aaaa33',
+	},
 }
 
 export function getBuildingDef(id: string): BuildingDefinition {

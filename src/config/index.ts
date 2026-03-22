@@ -1,5 +1,7 @@
 export type { BuildingDefinition } from './buildings'
 export { BUILDING_DEFINITIONS, getBuildingDef } from './buildings'
 export { GAME_CONFIG } from './game'
+export type { MapDefinition } from './maps'
+export { getMapById, getRandomMap, MAP_DEFINITIONS } from './maps'
 export type { UnitDefinition } from './units'
 export { getUnitDef, UNIT_DEFINITIONS } from './units'

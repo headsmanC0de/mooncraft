@@ -6,6 +6,8 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { getBuildingDef } from '@/config/buildings'
+import type { MapDefinition } from '@/config/maps'
+import { getMapById, getRandomMap } from '@/config/maps'
 import { getUnitDef } from '@/config/units'
 import { audioEngine } from '@/lib/audio'
 import {
@@ -22,8 +24,10 @@ import {
 	systemManager,
 	VisionSystem,
 } from '@/lib/ecs'
+import type { AIDifficulty } from '@/lib/ecs/systems/AISystem'
 import type { GameStatus } from '@/lib/game/GameManager'
 import { calculateSupplyFromEntities } from '@/lib/game/supply'
+import { canBuild } from '@/lib/game/techTree'
 import type { BuildingComponent, EntityId, GameState, PlayerState, Vector3 } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 
@@ -34,6 +38,7 @@ function spawnStartingBase(
 	faction: 'terran' | 'protoss',
 	basePosition: Vector3,
 	mineralPositions: Vector3[],
+	gasGeyserPosition: Vector3,
 ) {
 	const mainBuilding = faction === 'terran' ? 'command_center' : 'nexus'
 	const workerType = faction === 'terran' ? 'worker' : 'probe'
@@ -65,9 +70,15 @@ function spawnStartingBase(
 	for (const pos of mineralPositions) {
 		factory.createMineralPatch(pos)
 	}
+
+	// Create gas geyser
+	factory.createGasGeyser(gasGeyserPosition)
 }
 
 interface GameStore extends GameState {
+	// Map
+	currentMap: MapDefinition | null
+
 	// Selection
 	selectedUnits: EntityId[]
 
@@ -85,6 +96,12 @@ interface GameStore extends GameState {
 
 	// Player faction selection
 	playerFaction: 'terran' | 'protoss'
+
+	// AI difficulty
+	aiDifficulty: AIDifficulty
+
+	// Selected map (null = random)
+	selectedMapId: string | null
 
 	// Actions
 	initializeGame: () => void
@@ -110,6 +127,7 @@ export const useGameStore = create<GameStore>()(
 		players: new Map(),
 		isPaused: true,
 		speed: 1,
+		currentMap: null,
 		selectedUnits: [],
 		cameraPosition: { x: 40, y: 50, z: 40 },
 		cameraZoom: 30,
@@ -118,6 +136,8 @@ export const useGameStore = create<GameStore>()(
 		showPauseMenu: false,
 		gameStatus: 'playing' as GameStatus,
 		playerFaction: 'terran' as 'terran' | 'protoss',
+		aiDifficulty: 'normal' as AIDifficulty,
+		selectedMapId: null,
 
 		initializeGame: () => {
 			// Register systems
@@ -127,23 +147,23 @@ export const useGameStore = create<GameStore>()(
 			systemManager.registerSystem(new CombatSystem())
 			systemManager.registerSystem(new ProductionSystem())
 			const resourceSystem = new ResourceSystem()
-			resourceSystem.setDepositCallback((playerId, amount) => {
+			resourceSystem.setDepositCallback((playerId, amount, resourceType) => {
 				const state = useGameStore.getState()
 				const player = state.players.get(playerId)
 				if (player) {
 					const players = new Map(state.players)
-					players.set(playerId, {
-						...player,
-						resources: {
-							...player.resources,
-							minerals: player.resources.minerals + amount,
-						},
-					})
+					const resources = { ...player.resources }
+					if (resourceType === 'gas') {
+						resources.gas += amount
+					} else {
+						resources.minerals += amount
+					}
+					players.set(playerId, { ...player, resources })
 					useGameStore.setState({ players })
 				}
 			})
 			systemManager.registerSystem(resourceSystem)
-			systemManager.registerSystem(new AISystem())
+			systemManager.registerSystem(new AISystem(undefined, undefined, get().aiDifficulty))
 			systemManager.registerSystem(new VisionSystem())
 
 			// Determine factions based on player selection
@@ -169,34 +189,45 @@ export const useGameStore = create<GameStore>()(
 				isAlive: true,
 			})
 
+			// Pick map based on selection
+			const map = get().selectedMapId ? getMapById(get().selectedMapId!) : getRandomMap()
+
 			// Spawn starting entities
 			const factory = new EntityFactory(entityManager, componentManager)
 
-			// Player 1 starting base (around x=20, z=20)
-			spawnStartingBase(factory, 'player1', 'team1', playerFaction, { x: 20, y: 0, z: 20 }, [
-				{ x: 8, y: 0, z: 15 },
-				{ x: 10, y: 0, z: 15 },
-				{ x: 12, y: 0, z: 15 },
-				{ x: 14, y: 0, z: 15 },
-				{ x: 8, y: 0, z: 17 },
-				{ x: 10, y: 0, z: 17 },
-				{ x: 12, y: 0, z: 17 },
-				{ x: 14, y: 0, z: 17 },
-			])
+			// Player 1 starting base
+			spawnStartingBase(
+				factory,
+				'player1',
+				'team1',
+				playerFaction,
+				map.player1.base,
+				map.player1.minerals,
+				map.player1.gasGeyser,
+			)
 
-			// Player 2 (AI) starting base (around x=108, z=108)
-			spawnStartingBase(factory, 'player2', 'team2', aiFaction, { x: 108, y: 0, z: 108 }, [
-				{ x: 114, y: 0, z: 103 },
-				{ x: 116, y: 0, z: 103 },
-				{ x: 118, y: 0, z: 103 },
-				{ x: 120, y: 0, z: 103 },
-				{ x: 114, y: 0, z: 105 },
-				{ x: 116, y: 0, z: 105 },
-				{ x: 118, y: 0, z: 105 },
-				{ x: 120, y: 0, z: 105 },
-			])
+			// Player 2 (AI) starting base
+			spawnStartingBase(
+				factory,
+				'player2',
+				'team2',
+				aiFaction,
+				map.player2.base,
+				map.player2.minerals,
+				map.player2.gasGeyser,
+			)
 
-			set({ players, isPaused: false })
+			// Set camera to player 1's base
+			set({
+				players,
+				isPaused: false,
+				currentMap: map,
+				cameraPosition: {
+					x: map.player1.base.x,
+					y: 25,
+					z: map.player1.base.z,
+				},
+			})
 			systemManager.start()
 		},
 
@@ -267,6 +298,12 @@ export const useGameStore = create<GameStore>()(
 			const state = get()
 			const player = state.players.get('player1')
 			if (!player) return
+
+			// Check tech tree requirements
+			if (!canBuild(buildingType, 'player1')) {
+				audioEngine.playError()
+				return
+			}
 
 			const def = getBuildingDef(buildingType)
 

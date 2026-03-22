@@ -1,8 +1,9 @@
 /**
  * AI System - Simple state machine AI for player2
- * Phases: BUILD (0-120s), EXPAND (120-300s), ATTACK (300s+)
+ * Phases: BUILD, EXPAND, ATTACK (boundaries set by difficulty)
  */
 
+import { GAME_CONFIG } from '@/config/game'
 import type { Entity, OwnerComponent } from '@/types/ecs'
 import { ComponentType } from '@/types/ecs'
 import type { ComponentManager } from '../ComponentManager'
@@ -15,20 +16,29 @@ import { executeAttackPhase } from './ai/AIAttackPhase'
 import { executeBuildPhase } from './ai/AIBuildPhase'
 import { executeExpandPhase } from './ai/AIExpandPhase'
 
+export type AIDifficulty = 'easy' | 'normal' | 'hard'
+
 export class AISystem extends System {
 	readonly requiredComponents = [ComponentType.OWNER]
 	readonly priority = 50
 	private timer = 0
-	private decisionInterval = 3 // seconds
+	private decisionInterval: number
+	private buildPhaseEnd: number
+	private expandPhaseEnd: number
 	private gameTime = 0
 	private factory: EntityFactory
 	private em: EntityManager
 
-	constructor(em?: EntityManager, cm?: ComponentManager) {
+	constructor(em?: EntityManager, cm?: ComponentManager, difficulty: AIDifficulty = 'normal') {
 		super()
 		this.em = em ?? defaultEM
 		const cm_ = cm ?? defaultCM
 		this.factory = new EntityFactory(this.em, cm_)
+
+		const config = GAME_CONFIG.aiDifficulty[difficulty]
+		this.decisionInterval = config.decisionInterval
+		this.buildPhaseEnd = config.buildPhaseEnd
+		this.expandPhaseEnd = config.expandPhaseEnd
 	}
 
 	update(entities: Entity[], deltaTime: number): void {
@@ -46,9 +56,9 @@ export class AISystem extends System {
 		const firstOwner = firstAI?.components.get(ComponentType.OWNER) as OwnerComponent | undefined
 		const faction = firstOwner?.faction ?? 'terran'
 
-		if (this.gameTime < 120) {
+		if (this.gameTime < this.buildPhaseEnd) {
 			executeBuildPhase(aiEntities, this.factory, this.em, faction)
-		} else if (this.gameTime < 300) {
+		} else if (this.gameTime < this.expandPhaseEnd) {
 			executeExpandPhase(aiEntities, this.factory, this.em, faction)
 		} else {
 			executeAttackPhase(aiEntities, this.factory, this.em, faction)

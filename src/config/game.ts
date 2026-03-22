@@ -3,6 +3,7 @@ export const GAME_CONFIG = {
 	startingResources: { minerals: 500, gas: 0, supply: 0, maxSupply: 10 },
 	map: { width: 128, height: 128, tileSize: 1 },
 	mineralPatch: { amount: 1500, gatherRate: 5, gatherInterval: 2 },
+	gasGeyser: { amount: 2500, gatherRate: 4, gatherInterval: 2.5 },
 	camera: {
 		initialPosition: { x: 20, y: 25, z: 20 },
 		initialZoom: 20,
@@ -12,4 +13,30 @@ export const GAME_CONFIG = {
 		edgeScrollThreshold: 30,
 	},
 	tickRate: 60,
+	aiDifficulty: {
+		easy: {
+			decisionInterval: 5,
+			buildPhaseEnd: 180,
+			expandPhaseEnd: 480,
+			attackTime: 600,
+			workerCap: 6,
+			label: 'Easy',
+		},
+		normal: {
+			decisionInterval: 3,
+			buildPhaseEnd: 120,
+			expandPhaseEnd: 300,
+			attackTime: 300,
+			workerCap: 10,
+			label: 'Normal',
+		},
+		hard: {
+			decisionInterval: 2,
+			buildPhaseEnd: 60,
+			expandPhaseEnd: 150,
+			attackTime: 180,
+			workerCap: 14,
+			label: 'Hard',
+		},
+	},
 } as const
